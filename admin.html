@@ -1,618 +1,910 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hydra Admin Dashboard | Secure Management</title>
   <meta name="description" content="Hydra administrative dashboard for team management and hydration analytics." />
   <meta name="robots" content="noindex, nofollow" />
-<link rel="icon" type="image/svg+xml" href="favicon.svg" />
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet" />
 
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg-app: #f8fafc;
-    --bg-sidebar: #ffffff;
-    --bg-card: #ffffff;
-    --border-nav: rgba(15, 23, 42, 0.08);
-    --border-card: rgba(15, 23, 42, 0.06);
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --text-tertiary: #94a3b8;
-    --brand: #0ea5e9;
-    --brand-light: #e0f2fe;
-    --success: #10b981;
-    --success-light: #d1fae5;
-    --danger: #ef4444;
-    --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
-    --radius-lg: 16px;
-    --radius-md: 12px;
-    --radius-sm: 8px;
-    --font: 'Geist', system-ui, sans-serif;
-    --font-mono: 'Geist Mono', monospace;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg-app: #030712;
-      --bg-sidebar: #111827;
-      --bg-card: #1f2937;
-      --border-nav: rgba(255,255,255,0.08);
-      --border-card: rgba(255,255,255,0.08);
-      --text-primary: #f9fafb;
-      --text-secondary: #9ca3af;
-      --text-tertiary: #4b5563;
-      --brand: #38bdf8;
-      --brand-light: rgba(56,189,248,0.15);
-      --success: #34d399;
-      --success-light: rgba(16,185,129,0.15);
-      --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
-  }
 
-  body {
-    font-family: var(--font);
-    background: var(--bg-app);
-    color: var(--text-primary);
-    height: 100dvh;
-    display: flex;
-    overflow: hidden;
-    -webkit-font-smoothing: antialiased;
-  }
+    :root {
+      --bg-app: #f8fafc;
+      --bg-sidebar: #ffffff;
+      --bg-card: #ffffff;
+      --border-nav: rgba(15, 23, 42, 0.08);
+      --border-card: rgba(15, 23, 42, 0.06);
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-tertiary: #94a3b8;
+      --brand: #0ea5e9;
+      --brand-light: #e0f2fe;
+      --success: #10b981;
+      --success-light: #d1fae5;
+      --danger: #ef4444;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --font: 'Geist', system-ui, sans-serif;
+      --font-mono: 'Geist Mono', monospace;
+    }
 
-  /* --- Sidebar --- */
-  .sidebar {
-    width: 260px;
-    background: var(--bg-sidebar);
-    border-right: 1px solid var(--border-nav);
-    display: flex;
-    flex-direction: column;
-    padding: 24px 20px;
-    z-index: 10;
-    transition: all 0.3s ease;
-  }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-app: #030712;
+        --bg-sidebar: #111827;
+        --bg-card: #1f2937;
+        --border-nav: rgba(255, 255, 255, 0.08);
+        --border-card: rgba(255, 255, 255, 0.08);
+        --text-primary: #f9fafb;
+        --text-secondary: #9ca3af;
+        --text-tertiary: #4b5563;
+        --brand: #38bdf8;
+        --brand-light: rgba(56, 189, 248, 0.15);
+        --success: #34d399;
+        --success-light: rgba(16, 185, 129, 0.15);
+        --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+      }
+    }
 
-  .logo-area {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 48px;
-    padding: 0 8px;
-  }
-  .logo-icon {
-    width: 32px; height: 32px;
-    background: linear-gradient(135deg, var(--brand), #0284c7);
-    border-radius: var(--radius-sm);
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 4px 12px rgba(14,165,233,0.3);
-  }
-  .logo-icon svg { width: 16px; height: 16px; fill: white; }
-  .logo-text { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; color: var(--text-primary); }
-  .logo-text .brand-letter { color: var(--brand); }
-  .logo-text .admin-text { font-weight: 400; color: var(--text-secondary); margin-left: 4px; }
+    body {
+      font-family: var(--font);
+      background: var(--bg-app);
+      color: var(--text-primary);
+      height: 100dvh;
+      display: flex;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
 
-  .nav-menu {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    flex: 1;
-  }
-  .nav-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 10px 14px;
-    border-radius: var(--radius-sm);
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-weight: 500; font-size: 14px;
-    transition: all 0.15s ease;
-    cursor: pointer;
-    background: transparent;
-    border: none;
-    font-family: inherit;
-    width: 100%;
-    text-align: left;
-  }
-  .nav-item svg { width: 18px; height: 18px; color: var(--text-tertiary); transition: color 0.15s; }
-  .nav-item:hover { background: var(--bg-app); color: var(--text-primary); }
-  .nav-item:hover svg { color: var(--brand); }
-  
-  .nav-item.active { background: var(--brand-light); color: var(--brand); }
-  .nav-item.active svg { color: var(--brand); }
+    /* --- Sidebar --- */
+    .sidebar {
+      width: 260px;
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--border-nav);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 20px;
+      z-index: 10;
+      transition: all 0.3s ease;
+    }
 
-  .sidebar-footer { margin-top: auto; border-top: 1px solid var(--border-nav); padding-top: 16px; }
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 48px;
+      padding: 0 8px;
+    }
 
-  /* --- Main Content --- */
-  .main-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    position: relative;
-    scrollbar-width: thin;
-  }
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--brand), #0284c7);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+    }
 
-  .topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 32px 48px;
-  }
-  .page-title h1 { font-size: 24px; font-weight: 600; letter-spacing: -0.5px; line-height: 1.2; }
-  .page-title p { color: var(--text-secondary); font-size: 14px; margin-top: 4px; }
-  
-  .admin-profile { display: flex; align-items: center; gap: 12px; }
-  .avatar {
-    width: 40px; height: 40px;
-    background: var(--bg-card);
-    border: 1px solid var(--border-card);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 600; color: var(--brand);
-    box-shadow: var(--shadow-sm);
-  }
-  .admin-details { display: flex; flex-direction: column; }
-  .admin-details .name { font-size: 14px; font-weight: 500; color: var(--text-primary); }
-  .admin-details .email { font-size: 12px; color: var(--text-secondary); }
+    .logo-icon svg {
+      width: 16px;
+      height: 16px;
+      fill: white;
+    }
 
-  /* --- Render Containers --- */
-  .content-wrapper { padding: 0 48px 48px 48px; flex: 1; display: flex; flex-direction: column; }
+    .logo-text {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      color: var(--text-primary);
+    }
 
-  /* Login screen */
-  .login-view {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    flex: 1; height: 100%;
-  }
-  .login-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-card);
-    padding: 40px; border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-    text-align: center; max-width: 400px; width: 100%;
-  }
-  .login-card h2 { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
-  .login-card p { color: var(--text-secondary); font-size: 14px; margin-bottom: 24px; line-height: 1.5; }
-  .btn-primary {
-    background: var(--text-primary); color: var(--bg-app);
-    border: none; padding: 12px 24px; border-radius: var(--radius-sm);
-    font-size: 14px; font-family: inherit; font-weight: 500;
-    cursor: pointer; width: 100%; transition: transform 0.15s;
-  }
-  .btn-primary:active { transform: scale(0.98); }
+    .logo-text .brand-letter {
+      color: var(--brand);
+    }
 
-  /* Dashboard View */
-  .dashboard-view { display: none; flex-direction: column; gap: 32px; width: 100%; max-width: 1400px; margin: 0 auto;}
+    .logo-text .admin-text {
+      font-weight: 400;
+      color: var(--text-secondary);
+      margin-left: 4px;
+    }
 
-  .metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 24px;
-  }
-  .metric-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-card);
-    border-radius: var(--radius-md);
-    padding: 24px;
-    box-shadow: var(--shadow-sm);
-    display: flex; align-items: flex-start; gap: 16px;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .metric-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
-  
-  .metric-icon {
-    width: 48px; height: 48px;
-    border-radius: var(--radius-sm);
-    background: var(--brand-light);
-    color: var(--brand);
-    display: flex; align-items: center; justify-content: center;
-  }
-  .metric-icon svg { width: 24px; height: 24px; }
-  
-  .metric-info { display: flex; flex-direction: column; gap: 4px; }
-  .metric-info .lbl { font-size: 13px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;}
-  .metric-info .val { font-size: 28px; font-weight: 600; letter-spacing: -0.5px; color: var(--text-primary); line-height: 1;}
+    .nav-menu {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
 
-  /* Table */
-  .table-section {
-    background: var(--bg-card);
-    border: 1px solid var(--border-card);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
-    overflow: hidden;
-  }
-  .table-header { padding: 20px 24px; border-bottom: 1px solid var(--border-card); display: flex; justify-content: space-between; align-items: center;}
-  .table-header h2 { font-size: 16px; font-weight: 600; }
-  
-  table { width: 100%; border-collapse: collapse; text-align: left; }
-  th {
-    padding: 14px 24px;
-    font-size: 12px; font-weight: 500; color: var(--text-tertiary);
-    text-transform: uppercase; letter-spacing: 0.5px;
-    background: var(--bg-app);
-    border-bottom: 1px solid var(--border-card);
-  }
-  td {
-    padding: 16px 24px;
-    border-bottom: 1px solid var(--border-card);
-    font-size: 14px; color: var(--text-primary);
-    vertical-align: middle;
-  }
-  tbody tr:hover { background: rgba(0,0,0,0.015); }
-  @media (prefers-color-scheme: dark) { tbody tr:hover { background: rgba(255,255,255,0.015); } }
-  tbody tr:last-child td { border-bottom: none; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.15s ease;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      font-family: inherit;
+      width: 100%;
+      text-align: left;
+    }
 
-  .user-id-col { display: flex; align-items: center; gap: 12px; }
-  .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--bg-app); border: 1px solid var(--border-card); display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--text-secondary);}
-  .user-id-text { font-family: var(--font-mono); font-size: 14px; font-weight: 500; }
+    .nav-item svg {
+      width: 18px;
+      height: 18px;
+      color: var(--text-tertiary);
+      transition: color 0.15s;
+    }
 
-  .prog-bar-wrap { width: 120px; height: 6px; background: var(--bg-app); border-radius: 4px; overflow: hidden; margin-top: 6px; }
-  .prog-bar-fill { height: 100%; background: var(--brand); border-radius: 4px; }
-  .prog-text { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
-  .prog-sub { font-size: 11px; color: var(--text-tertiary); margin-left: 4px;}
+    .nav-item:hover {
+      background: var(--bg-app);
+      color: var(--text-primary);
+    }
 
-  .badge {
-    display: inline-flex; align-items: center; padding: 4px 10px;
-    border-radius: 100px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
-  }
-  .badge.active { background: var(--success-light); color: var(--success); }
-  .badge.inactive { background: var(--bg-app); color: var(--text-secondary); }
+    .nav-item:hover svg {
+      color: var(--brand);
+    }
 
-  .loader { margin: 80px auto; width: 32px; height: 32px; border: 3px solid var(--border-card); border-top-color: var(--brand); border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+    .nav-item.active {
+      background: var(--brand-light);
+      color: var(--brand);
+    }
 
-  /* Error Banner */
-  .error-banner {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid var(--danger);
-    color: var(--danger);
-    padding: 16px;
-    border-radius: var(--radius-sm);
-    margin-bottom: 24px;
-    font-size: 14px;
-    font-weight: 500;
-    display: none;
-    text-align: center;
-  }
-</style>
+    .nav-item.active svg {
+      color: var(--brand);
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      border-top: 1px solid var(--border-nav);
+      padding-top: 16px;
+    }
+
+    /* --- Main Content --- */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      position: relative;
+      scrollbar-width: thin;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 32px 48px;
+    }
+
+    .page-title h1 {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+
+    .page-title p {
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .admin-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: var(--brand);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .admin-details {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .admin-details .name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .admin-details .email {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* --- Render Containers --- */
+    .content-wrapper {
+      padding: 0 48px 48px 48px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Login screen */
+    .login-view {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      height: 100%;
+    }
+
+    .login-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      padding: 40px;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .login-card h2 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .login-card p {
+      color: var(--text-secondary);
+      font-size: 14px;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .btn-primary {
+      background: var(--text-primary);
+      color: var(--bg-app);
+      border: none;
+      padding: 12px 24px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-family: inherit;
+      font-weight: 500;
+      cursor: pointer;
+      width: 100%;
+      transition: transform 0.15s;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    /* Dashboard View */
+    .dashboard-view {
+      display: none;
+      flex-direction: column;
+      gap: 32px;
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .metric-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-sm);
+      background: var(--brand-light);
+      color: var(--brand);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .metric-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .metric-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .metric-info .lbl {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .metric-info .val {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    /* Table */
+    .table-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .table-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-card);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .table-header h2 {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      padding: 14px 24px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: var(--bg-app);
+      border-bottom: 1px solid var(--border-card);
+    }
+
+    td {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border-card);
+      font-size: 14px;
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+
+    tbody tr:hover {
+      background: rgba(0, 0, 0, 0.015);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      tbody tr:hover {
+        background: rgba(255, 255, 255, 0.015);
+      }
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .user-id-col {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bg-app);
+      border: 1px solid var(--border-card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .user-id-text {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .prog-bar-wrap {
+      width: 120px;
+      height: 6px;
+      background: var(--bg-app);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .prog-bar-fill {
+      height: 100%;
+      background: var(--brand);
+      border-radius: 4px;
+    }
+
+    .prog-text {
+      font-size: 13px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .prog-sub {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-left: 4px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge.active {
+      background: var(--success-light);
+      color: var(--success);
+    }
+
+    .badge.inactive {
+      background: var(--bg-app);
+      color: var(--text-secondary);
+    }
+
+    .loader {
+      margin: 80px auto;
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--border-card);
+      border-top-color: var(--brand);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Error Banner */
+    .error-banner {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid var(--danger);
+      color: var(--danger);
+      padding: 16px;
+      border-radius: var(--radius-sm);
+      margin-bottom: 24px;
+      font-size: 14px;
+      font-weight: 500;
+      display: none;
+      text-align: center;
+    }
+  </style>
 </head>
+
 <body>
 
-<aside class="sidebar">
-  <div class="logo-area">
-    <div class="logo-icon">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2C12 2 5 10 5 15a7 7 0 0014 0C19 10 12 2 12 2z"/>
-      </svg>
-    </div>
-    <div class="logo-text">hydr<span class="brand-letter">a</span><span class="admin-text">Admin</span></div>
-  </div>
-  
-  <nav class="nav-menu">
-    <button class="nav-item" id="navDashboard">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>
-      </svg>
-      Dashboard Overview
-    </button>
-    <button class="nav-item" id="navTeams">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-      </svg>
-      Manage Teams
-    </button>
-  </nav>
-
-  <div class="sidebar-footer">
-    <button class="nav-item" id="logoutBtn" style="display:none;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-      </svg>
-      Log Out
-    </button>
-  </div>
-</aside>
-
-<main class="main-content">
-  <header class="topbar">
-    <div class="page-title">
-      <h1>Overview</h1>
-      <p>Real-time hydration analytics & user metrics</p>
-    </div>
-    <div class="admin-profile" id="adminProfile" style="display:none;">
-      <div class="avatar" id="adminAvatar">A</div>
-      <div class="admin-details">
-        <span class="name">Administrator</span>
-        <span class="email" id="adminEmail">admin@hydra</span>
+  <aside class="sidebar">
+    <div class="logo-area">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C12 2 5 10 5 15a7 7 0 0014 0C19 10 12 2 12 2z" />
+        </svg>
       </div>
+      <div class="logo-text">hydr<span class="brand-letter">a</span><span class="admin-text">Admin</span></div>
     </div>
-  </header>
 
-  <div class="content-wrapper">
-    
-    <div class="loader" id="loader"></div>
-    <div class="error-banner" id="errorBanner">You do not have permission to view this dashboard.</div>
+    <nav class="nav-menu">
+      <button class="nav-item" id="navDashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="9" />
+          <rect x="14" y="3" width="7" height="5" />
+          <rect x="14" y="12" width="7" height="9" />
+          <rect x="3" y="16" width="7" height="5" />
+        </svg>
+        Dashboard Overview
+      </button>
+      <button class="nav-item" id="navTeams">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+        Manage Teams
+      </button>
+    </nav>
 
-    <!-- Login View -->
-    <div class="login-view" id="loginView">
-      <div class="login-card">
-        <h2>Administrator Access Required</h2>
-        <p>Please authenticate with your secure administrator credentials to access the Hydra dashboard ecosystem.</p>
-        <button class="btn-primary" id="loginActionBtn">Authenticate via Google</button>
+    <div class="sidebar-footer">
+      <button class="nav-item" id="logoutBtn" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
+        </svg>
+        Log Out
+      </button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="page-title">
+        <h1>Overview</h1>
+        <p>Real-time hydration analytics & user metrics</p>
       </div>
-    </div>
-
-    <!-- Dashboard View -->
-    <div class="dashboard-view" id="dashboardView">
-      
-      <div class="metrics-grid">
-        <div class="metric-card">
-          <div class="metric-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
-          </div>
-          <div class="metric-info">
-            <span class="lbl">Total Users</span>
-            <span class="val" id="statTotalUsers">0</span>
-          </div>
+      <div class="admin-profile" id="adminProfile" style="display:none;">
+        <div class="avatar" id="adminAvatar">A</div>
+        <div class="admin-details">
+          <span class="name">Administrator</span>
+          <span class="email" id="adminEmail">admin@hydra</span>
         </div>
+      </div>
+    </header>
 
-        <div class="metric-card">
-          <div class="metric-icon" style="background:var(--success-light); color:var(--success);">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2C12 2 5 10 5 15a7 7 0 0 0 14 0C19 10 12 2 12 2z"/>
-            </svg>
-          </div>
-          <div class="metric-info">
-            <span class="lbl">Total Intake Today</span>
-            <span class="val" id="statTotalIntake">0 L</span>
-          </div>
-        </div>
+    <div class="content-wrapper">
 
-        <div class="metric-card">
-          <div class="metric-icon" style="background:rgba(245,158,11,0.15); color:#f59e0b;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-               <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-            </svg>
-          </div>
-          <div class="metric-info">
-            <span class="lbl">Highest Streak</span>
-            <span class="val" id="statHighestStreak">0</span>
-          </div>
+      <div class="loader" id="loader"></div>
+      <div class="error-banner" id="errorBanner">You do not have permission to view this dashboard.</div>
+
+      <!-- Login View -->
+      <div class="login-view" id="loginView">
+        <div class="login-card">
+          <h2>Administrator Access Required</h2>
+          <p>Please authenticate with your secure administrator credentials to access the Hydra dashboard ecosystem.</p>
+          <button class="btn-primary" id="loginActionBtn">Authenticate via Google</button>
         </div>
       </div>
 
-      <div class="table-section">
-        <div class="table-header">
-          <h2>User Directory</h2>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>User UID</th>
-              <th>Last Active Date</th>
-              <th>Today's Progression</th>
-              <th>Streak</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="tableBody">
-            <!-- JS populated -->
-          </tbody>
-        </table>
-      </div>
+      <!-- Dashboard View -->
+      <div class="dashboard-view" id="dashboardView">
 
-    </div>
-
-    <!-- Teams View -->
-    <div class="dashboard-view" id="teamsView" style="display:none;">
-      
-      <div class="table-section" style="margin-bottom: 32px; padding: 24px;">
-        <div class="table-header" style="padding: 0 0 20px 0; border-bottom: none;">
-          <h2>Create New Team</h2>
-        </div>
-        <div style="display: flex; gap: 12px; align-items: flex-end;">
-          <div style="flex: 1;">
-            <label style="display: block; font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 8px;">TEAM NAME</label>
-            <input type="text" id="newTeamName" placeholder="e.g. Sales Warriors" style="width: 100%; padding: 12px; border: 1px solid var(--border-card); border-radius: var(--radius-sm); background: var(--bg-app); color: var(--text-primary); font-family: inherit;">
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+              </svg>
+            </div>
+            <div class="metric-info">
+              <span class="lbl">Total Users</span>
+              <span class="val" id="statTotalUsers">0</span>
+            </div>
           </div>
-          <button class="btn-primary" id="createTeamBtn" style="width: auto; padding: 12px 24px;">Create Team</button>
+
+          <div class="metric-card">
+            <div class="metric-icon" style="background:var(--success-light); color:var(--success);">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M12 2C12 2 5 10 5 15a7 7 0 0 0 14 0C19 10 12 2 12 2z" />
+              </svg>
+            </div>
+            <div class="metric-info">
+              <span class="lbl">Total Intake Today</span>
+              <span class="val" id="statTotalIntake">0 L</span>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-icon" style="background:rgba(245,158,11,0.15); color:#f59e0b;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+              </svg>
+            </div>
+            <div class="metric-info">
+              <span class="lbl">Highest Streak</span>
+              <span class="val" id="statHighestStreak">0</span>
+            </div>
+          </div>
         </div>
+
+        <div class="table-section">
+          <div class="table-header">
+            <h2>User Directory</h2>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>User UID</th>
+                <th>Last Active Date</th>
+                <th>Today's Progression</th>
+                <th>Streak</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <!-- JS populated -->
+            </tbody>
+          </table>
+        </div>
+
       </div>
 
-      <div class="table-section">
-        <div class="table-header">
-          <h2>Active Teams</h2>
+      <!-- Teams View -->
+      <div class="dashboard-view" id="teamsView" style="display:none;">
+
+        <div class="table-section" style="margin-bottom: 32px; padding: 24px;">
+          <div class="table-header" style="padding: 0 0 20px 0; border-bottom: none;">
+            <h2>Create New Team</h2>
+          </div>
+          <div style="display: flex; gap: 12px; align-items: flex-end;">
+            <div style="flex: 1;">
+              <label
+                style="display: block; font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 8px;">TEAM
+                NAME</label>
+              <input type="text" id="newTeamName" placeholder="e.g. Sales Warriors"
+                style="width: 100%; padding: 12px; border: 1px solid var(--border-card); border-radius: var(--radius-sm); background: var(--bg-app); color: var(--text-primary); font-family: inherit;">
+            </div>
+            <button class="btn-primary" id="createTeamBtn" style="width: auto; padding: 12px 24px;">Create Team</button>
+          </div>
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Team Name</th>
-              <th>Join Code</th>
-              <th>Created Date</th>
-              <th>Admin UID</th>
-            </tr>
-          </thead>
-          <tbody id="teamsTableBody">
-            <!-- JS populated -->
-          </tbody>
-        </table>
+
+        <div class="table-section">
+          <div class="table-header">
+            <h2>Active Teams</h2>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Team Name</th>
+                <th>Join Code</th>
+                <th>Created Date</th>
+                <th>Admin UID</th>
+              </tr>
+            </thead>
+            <tbody id="teamsTableBody">
+              <!-- JS populated -->
+            </tbody>
+          </table>
+        </div>
+
       </div>
 
     </div>
+  </main>
 
-  </div>
-</main>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+    import { firebaseConfig } from "./firebase-config.js";
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-  import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
-  import { firebaseConfig } from "./firebase-config.js";
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+    const ADMIN_EMAIL = "arshinmrelju@gmail.com";
 
-  const ADMIN_EMAIL = "arshinmrelju@gmail.com";
+    const ui = {
+      loginView: document.getElementById('loginView'),
+      dashboardView: document.getElementById('dashboardView'),
+      loginActionBtn: document.getElementById('loginActionBtn'),
+      logoutBtn: document.getElementById('logoutBtn'),
+      errorBanner: document.getElementById('errorBanner'),
+      loader: document.getElementById('loader'),
+      adminProfile: document.getElementById('adminProfile'),
+      adminEmail: document.getElementById('adminEmail'),
+      adminAvatar: document.getElementById('adminAvatar'),
 
-  const ui = {
-    loginView: document.getElementById('loginView'),
-    dashboardView: document.getElementById('dashboardView'),
-    loginActionBtn: document.getElementById('loginActionBtn'),
-    logoutBtn: document.getElementById('logoutBtn'),
-    errorBanner: document.getElementById('errorBanner'),
-    loader: document.getElementById('loader'),
-    adminProfile: document.getElementById('adminProfile'),
-    adminEmail: document.getElementById('adminEmail'),
-    adminAvatar: document.getElementById('adminAvatar'),
-    
-    // Stats
-    statTotalUsers: document.getElementById('statTotalUsers'),
-    statTotalIntake: document.getElementById('statTotalIntake'),
-    statHighestStreak: document.getElementById('statHighestStreak'),
-    tableBody: document.getElementById('tableBody'),
-    
-    // Teams UI
-    navDashboard: document.getElementById('navDashboard'),
-    navTeams: document.getElementById('navTeams'),
-    teamsView: document.getElementById('teamsView'),
-    createTeamBtn: document.getElementById('createTeamBtn'),
-    newTeamNameInput: document.getElementById('newTeamName'),
-    teamsTableBody: document.getElementById('teamsTableBody')
-  };
+      // Stats
+      statTotalUsers: document.getElementById('statTotalUsers'),
+      statTotalIntake: document.getElementById('statTotalIntake'),
+      statHighestStreak: document.getElementById('statHighestStreak'),
+      tableBody: document.getElementById('tableBody'),
 
-  ui.loginActionBtn.addEventListener('click', () => {
-    signInWithPopup(auth, new GoogleAuthProvider()).catch(e => alert(e.message));
-  });
-  
-  ui.logoutBtn.addEventListener('click', () => {
-    signOut(auth);
-  });
+      // Teams UI
+      navDashboard: document.getElementById('navDashboard'),
+      navTeams: document.getElementById('navTeams'),
+      teamsView: document.getElementById('teamsView'),
+      createTeamBtn: document.getElementById('createTeamBtn'),
+      newTeamNameInput: document.getElementById('newTeamName'),
+      teamsTableBody: document.getElementById('teamsTableBody')
+    };
 
-  let currentView = 'dashboard';
-  let isAdmin = false;
+    ui.loginActionBtn.addEventListener('click', () => {
+      signInWithPopup(auth, new GoogleAuthProvider()).catch(e => alert(e.message));
+    });
 
-  ui.navDashboard.addEventListener('click', () => {
-    switchView('dashboard');
-  });
+    ui.logoutBtn.addEventListener('click', () => {
+      signOut(auth);
+    });
 
-  ui.navTeams.addEventListener('click', () => {
-    switchView('teams');
-  });
+    let currentView = 'dashboard';
+    let isAdmin = false;
 
-  ui.createTeamBtn.addEventListener('click', createTeam);
+    ui.navDashboard.addEventListener('click', () => {
+      switchView('dashboard');
+    });
 
-  function switchView(view) {
-    currentView = view;
-    ui.navDashboard.classList.toggle('active', view === 'dashboard');
-    ui.navTeams.classList.toggle('active', view === 'teams');
-    
-    // Hide all views first
-    ui.dashboardView.style.display = 'none';
-    ui.teamsView.style.display = 'none';
-    ui.errorBanner.style.display = 'none';
+    ui.navTeams.addEventListener('click', () => {
+      switchView('teams');
+    });
 
-    if (isAdmin) {
-      if (view === 'dashboard') {
-        ui.dashboardView.style.display = 'flex';
-        loadDashboardData();
-      }
-      if (view === 'teams') {
-        ui.teamsView.style.display = 'flex';
-        loadTeamsData();
+    ui.createTeamBtn.addEventListener('click', createTeam);
+
+    function switchView(view) {
+      currentView = view;
+      ui.navDashboard.classList.toggle('active', view === 'dashboard');
+      ui.navTeams.classList.toggle('active', view === 'teams');
+
+      // Hide all views first
+      ui.dashboardView.style.display = 'none';
+      ui.teamsView.style.display = 'none';
+      ui.errorBanner.style.display = 'none';
+
+      if (isAdmin) {
+        if (view === 'dashboard') {
+          ui.dashboardView.style.display = 'flex';
+          loadDashboardData();
+        }
+        if (view === 'teams') {
+          ui.teamsView.style.display = 'flex';
+          loadTeamsData();
+        }
       }
     }
-  }
 
-  onAuthStateChanged(auth, (user) => {
-    ui.errorBanner.style.display = 'none';
-    if (user) {
-      if (user.email === ADMIN_EMAIL) {
-        // Authenticated as Admin
-        isAdmin = true;
-        ui.loginView.style.display = 'none';
-        ui.adminProfile.style.display = 'flex';
-        ui.logoutBtn.style.display = 'flex';
-        ui.adminEmail.textContent = user.email;
-        ui.adminAvatar.textContent = user.email.charAt(0).toUpperCase();
-        
-        // Load the view user was trying to see
-        switchView(currentView);
+    onAuthStateChanged(auth, (user) => {
+      ui.errorBanner.style.display = 'none';
+      if (user) {
+        if (user.email === ADMIN_EMAIL) {
+          // Authenticated as Admin
+          isAdmin = true;
+          ui.loginView.style.display = 'none';
+          ui.adminProfile.style.display = 'flex';
+          ui.logoutBtn.style.display = 'flex';
+          ui.adminEmail.textContent = user.email;
+          ui.adminAvatar.textContent = user.email.charAt(0).toUpperCase();
+
+          // Load the view user was trying to see
+          switchView(currentView);
+        } else {
+          // Logged in, but unauthorized
+          isAdmin = false;
+          ui.loginView.style.display = 'flex';
+          ui.dashboardView.style.display = 'none';
+          ui.teamsView.style.display = 'none';
+          ui.adminProfile.style.display = 'none';
+          ui.logoutBtn.style.display = 'flex';
+          ui.errorBanner.textContent = "You do not have permission to view this dashboard.";
+          ui.errorBanner.style.display = 'block';
+        }
       } else {
-        // Logged in, but unauthorized
+        // Logged out
         isAdmin = false;
         ui.loginView.style.display = 'flex';
         ui.dashboardView.style.display = 'none';
         ui.teamsView.style.display = 'none';
         ui.adminProfile.style.display = 'none';
-        ui.logoutBtn.style.display = 'flex';
-        ui.errorBanner.textContent = "You do not have permission to view this dashboard.";
-        ui.errorBanner.style.display = 'block';
+        ui.logoutBtn.style.display = 'none';
       }
-    } else {
-      // Logged out
-      isAdmin = false;
-      ui.loginView.style.display = 'flex';
+    });
+
+    async function loadDashboardData() {
+      ui.loader.style.display = 'block';
       ui.dashboardView.style.display = 'none';
-      ui.teamsView.style.display = 'none';
-      ui.adminProfile.style.display = 'none';
-      ui.logoutBtn.style.display = 'none';
-    }
-  });
 
-  async function loadDashboardData() {
-    ui.loader.style.display = 'block';
-    ui.dashboardView.style.display = 'none';
+      try {
+        const snap = await getDocs(collection(db, "users"));
+        let arr = [];
+        let totalIntake = 0;
+        let highestStreak = 0;
+        const today = new Date().toISOString().slice(0, 10);
 
-    try {
-      const snap = await getDocs(collection(db, "users"));
-      let arr = [];
-      let totalIntake = 0;
-      let highestStreak = 0;
-      const today = new Date().toISOString().slice(0,10);
+        snap.forEach(doc => {
+          const d = doc.data();
+          arr.push({ id: doc.id, ...d });
+          if (d.date === today) {
+            totalIntake += (d.intake || 0);
+          }
+          if (d.streak > highestStreak) {
+            highestStreak = d.streak;
+          }
+        });
 
-      snap.forEach(doc => {
-        const d = doc.data();
-        arr.push({ id: doc.id, ...d });
-        if (d.date === today) {
-          totalIntake += (d.intake || 0);
-        }
-        if (d.streak > highestStreak) {
-          highestStreak = d.streak;
-        }
-      });
+        // Sort by intake today, then streak
+        arr.sort((a, b) => {
+          const aIntake = a.date === today ? (a.intake || 0) : 0;
+          const bIntake = b.date === today ? (b.intake || 0) : 0;
+          if (bIntake !== aIntake) return bIntake - aIntake;
+          return (b.streak || 0) - (a.streak || 0);
+        });
 
-      // Sort by intake today, then streak
-      arr.sort((a, b) => {
-        const aIntake = a.date === today ? (a.intake || 0) : 0;
-        const bIntake = b.date === today ? (b.intake || 0) : 0;
-        if (bIntake !== aIntake) return bIntake - aIntake;
-        return (b.streak || 0) - (a.streak || 0);
-      });
+        // Update metrics grids
+        ui.statTotalUsers.textContent = arr.length;
+        ui.statTotalIntake.textContent = (totalIntake / 1000).toFixed(1) + ' L';
+        ui.statHighestStreak.textContent = highestStreak + ' 🔥';
 
-      // Update metrics grids
-      ui.statTotalUsers.textContent = arr.length;
-      ui.statTotalIntake.textContent = (totalIntake / 1000).toFixed(1) + ' L';
-      ui.statHighestStreak.textContent = highestStreak + ' 🔥';
+        // Update table
+        ui.tableBody.innerHTML = '';
+        if (arr.length === 0) {
+          ui.tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-tertiary);">No users found in database.</td></tr>`;
+        } else {
+          arr.forEach(u => {
+            const userIntake = u.date === today ? (u.intake || 0) : 0;
+            const userGoal = u.goal || 2500;
+            const pct = Math.min(100, (userIntake / userGoal) * 100);
+            const reached = userIntake >= userGoal;
+            const userDisplayName = u.userName || (u.id.length > 8 ? u.id.substring(0, 8) + '...' : u.id);
+            const isActiveToday = u.date === today;
 
-      // Update table
-      ui.tableBody.innerHTML = '';
-      if (arr.length === 0) {
-        ui.tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-tertiary);">No users found in database.</td></tr>`;
-      } else {
-        arr.forEach(u => {
-          const userIntake = u.date === today ? (u.intake || 0) : 0;
-          const userGoal = u.goal || 2500;
-          const pct = Math.min(100, (userIntake / userGoal) * 100);
-          const reached = userIntake >= userGoal;
-          const userDisplayName = u.userName || (u.id.length > 8 ? u.id.substring(0,8)+'...' : u.id);
-          const isActiveToday = u.date === today;
-
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
             <td>
               <div class="user-id-col">
                 <div class="user-avatar">${userDisplayName.charAt(0).toUpperCase()}</div>
@@ -621,8 +913,8 @@
             </td>
             <td>${u.date || 'N/A'}</td>
             <td>
-              <span class="prog-text">${(userIntake/1000).toFixed(1)}L</span>
-              <span class="prog-sub">/ ${(userGoal/1000).toFixed(1)}L</span>
+              <span class="prog-text">${(userIntake / 1000).toFixed(1)}L</span>
+              <span class="prog-sub">/ ${(userGoal / 1000).toFixed(1)}L</span>
               <div class="prog-bar-wrap">
                 <div class="prog-bar-fill" style="width:${pct}%; ${reached ? 'background:var(--success)' : ''}"></div>
               </div>
@@ -634,81 +926,82 @@
               </span>
             </td>
           `;
-          ui.tableBody.appendChild(tr);
-        });
+            ui.tableBody.appendChild(tr);
+          });
+        }
+
+        ui.loader.style.display = 'none';
+        ui.dashboardView.style.display = 'flex';
+      } catch (e) {
+        console.error(e);
+        ui.loader.style.display = 'none';
+        ui.errorBanner.textContent = "Data Error: " + e.message;
+        ui.errorBanner.style.display = 'block';
       }
-
-      ui.loader.style.display = 'none';
-      ui.dashboardView.style.display = 'flex';
-    } catch (e) {
-      console.error(e);
-      ui.loader.style.display = 'none';
-      ui.errorBanner.textContent = "Data Error: " + e.message;
-      ui.errorBanner.style.display = 'block';
     }
-  }
 
-  async function loadTeamsData() {
-    ui.loader.style.display = 'block';
-    ui.teamsView.style.display = 'none';
+    async function loadTeamsData() {
+      ui.loader.style.display = 'block';
+      ui.teamsView.style.display = 'none';
 
-    try {
-      const snap = await getDocs(collection(db, "groups"));
-      ui.teamsTableBody.innerHTML = '';
-      
-      if (snap.empty) {
-        ui.teamsTableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-tertiary);">No teams created yet.</td></tr>`;
-      } else {
-        snap.forEach(doc => {
-          const t = doc.data();
-          const tr = document.createElement('tr');
-          const dateStr = t.createdAt ? new Date(t.createdAt.seconds * 1000).toLocaleDateString() : 'N/A';
-          tr.innerHTML = `
+      try {
+        const snap = await getDocs(collection(db, "groups"));
+        ui.teamsTableBody.innerHTML = '';
+
+        if (snap.empty) {
+          ui.teamsTableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-tertiary);">No teams created yet.</td></tr>`;
+        } else {
+          snap.forEach(doc => {
+            const t = doc.data();
+            const tr = document.createElement('tr');
+            const dateStr = t.createdAt ? new Date(t.createdAt.seconds * 1000).toLocaleDateString() : 'N/A';
+            tr.innerHTML = `
             <td style="font-weight:600;">${t.name}</td>
             <td><code style="background:var(--brand-light); color:var(--brand); padding:4px 8px; border-radius:4px; font-weight:600;">${t.code}</code></td>
             <td>${dateStr}</td>
-            <td style="font-size:12px; color:var(--text-secondary); font-family:var(--font-mono);">${t.adminUid.substring(0,8)}...</td>
+            <td style="font-size:12px; color:var(--text-secondary); font-family:var(--font-mono);">${t.adminUid.substring(0, 8)}...</td>
           `;
-          ui.teamsTableBody.appendChild(tr);
-        });
+            ui.teamsTableBody.appendChild(tr);
+          });
+        }
+        ui.loader.style.display = 'none';
+        ui.teamsView.style.display = 'flex';
+      } catch (e) {
+        console.error(e);
+        ui.loader.style.display = 'none';
+        ui.errorBanner.textContent = "Teams Data Error: " + e.message;
+        ui.errorBanner.style.display = 'block';
       }
-      ui.loader.style.display = 'none';
-      ui.teamsView.style.display = 'flex';
-    } catch (e) {
-      console.error(e);
-      ui.loader.style.display = 'none';
-      ui.errorBanner.textContent = "Teams Data Error: " + e.message;
-      ui.errorBanner.style.display = 'block';
     }
-  }
 
-  async function createTeam() {
-    const name = ui.newTeamNameInput.value.trim();
-    if (!name) return alert("Please enter a team name.");
-    
-    ui.createTeamBtn.disabled = true;
-    ui.createTeamBtn.textContent = "Creating...";
+    async function createTeam() {
+      const name = ui.newTeamNameInput.value.trim();
+      if (!name) return alert("Please enter a team name.");
 
-    try {
-      const { addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js");
-      const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-      
-      await addDoc(collection(db, "groups"), {
-        name: name,
-        code: code,
-        adminUid: auth.currentUser.uid,
-        createdAt: serverTimestamp()
-      });
+      ui.createTeamBtn.disabled = true;
+      ui.createTeamBtn.textContent = "Creating...";
 
-      ui.newTeamNameInput.value = '';
-      loadTeamsData();
-    } catch (e) {
-      alert("Error: " + e.message);
-    } finally {
-      ui.createTeamBtn.disabled = false;
-      ui.createTeamBtn.textContent = "Create Team";
+      try {
+        const { addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js");
+        const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+
+        await addDoc(collection(db, "groups"), {
+          name: name,
+          code: code,
+          adminUid: auth.currentUser.uid,
+          createdAt: serverTimestamp()
+        });
+
+        ui.newTeamNameInput.value = '';
+        loadTeamsData();
+      } catch (e) {
+        alert("Error: " + e.message);
+      } finally {
+        ui.createTeamBtn.disabled = false;
+        ui.createTeamBtn.textContent = "Create Team";
+      }
     }
-  }
-</script>
+  </script>
 </body>
+
 </html>
