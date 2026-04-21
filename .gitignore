@@ -4,3 +4,4 @@ firestore-debug.log
 firebase-debug.log
 node_modules/
 .DS_Store
+firebase-config.js

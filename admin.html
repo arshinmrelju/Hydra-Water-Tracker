@@ -448,16 +448,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
   import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
   import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyBhfX6H8QIt_E6dFkVHeXwqr7Z6rf-mCls",
-    authDomain: "watermeterpro.firebaseapp.com",
-    projectId: "watermeterpro",
-    storageBucket: "watermeterpro.firebasestorage.app",
-    messagingSenderId: "60708408734",
-    appId: "1:60708408734:web:d0ffcb5797b1e7d5a31a8f",
-    measurementId: "G-E3XJLD2142"
-  };
+  import { firebaseConfig } from "./firebase-config.js";
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
