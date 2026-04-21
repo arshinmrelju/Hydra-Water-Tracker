@@ -288,11 +288,17 @@
   </div>
   
   <nav class="nav-menu">
-    <button class="nav-item active">
+    <button class="nav-item" id="navDashboard">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>
       </svg>
       Dashboard Overview
+    </button>
+    <button class="nav-item" id="navTeams">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      Manage Teams
     </button>
   </nav>
 
@@ -398,6 +404,43 @@
 
     </div>
 
+    <!-- Teams View -->
+    <div class="dashboard-view" id="teamsView" style="display:none;">
+      
+      <div class="table-section" style="margin-bottom: 32px; padding: 24px;">
+        <div class="table-header" style="padding: 0 0 20px 0; border-bottom: none;">
+          <h2>Create New Team</h2>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: flex-end;">
+          <div style="flex: 1;">
+            <label style="display: block; font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 8px;">TEAM NAME</label>
+            <input type="text" id="newTeamName" placeholder="e.g. Sales Warriors" style="width: 100%; padding: 12px; border: 1px solid var(--border-card); border-radius: var(--radius-sm); background: var(--bg-app); color: var(--text-primary); font-family: inherit;">
+          </div>
+          <button class="btn-primary" id="createTeamBtn" style="width: auto; padding: 12px 24px;">Create Team</button>
+        </div>
+      </div>
+
+      <div class="table-section">
+        <div class="table-header">
+          <h2>Active Teams</h2>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Team Name</th>
+              <th>Join Code</th>
+              <th>Created Date</th>
+              <th>Admin UID</th>
+            </tr>
+          </thead>
+          <tbody id="teamsTableBody">
+            <!-- JS populated -->
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
   </div>
 </main>
 
@@ -437,7 +480,15 @@
     statTotalUsers: document.getElementById('statTotalUsers'),
     statTotalIntake: document.getElementById('statTotalIntake'),
     statHighestStreak: document.getElementById('statHighestStreak'),
-    tableBody: document.getElementById('tableBody')
+    tableBody: document.getElementById('tableBody'),
+    
+    // Teams UI
+    navDashboard: document.getElementById('navDashboard'),
+    navTeams: document.getElementById('navTeams'),
+    teamsView: document.getElementById('teamsView'),
+    createTeamBtn: document.getElementById('createTeamBtn'),
+    newTeamNameInput: document.getElementById('newTeamName'),
+    teamsTableBody: document.getElementById('teamsTableBody')
   };
 
   ui.loginActionBtn.addEventListener('click', () => {
@@ -448,30 +499,72 @@
     signOut(auth);
   });
 
+  let currentView = 'dashboard';
+  let isAdmin = false;
+
+  ui.navDashboard.addEventListener('click', () => {
+    switchView('dashboard');
+  });
+
+  ui.navTeams.addEventListener('click', () => {
+    switchView('teams');
+  });
+
+  ui.createTeamBtn.addEventListener('click', createTeam);
+
+  function switchView(view) {
+    currentView = view;
+    ui.navDashboard.classList.toggle('active', view === 'dashboard');
+    ui.navTeams.classList.toggle('active', view === 'teams');
+    
+    // Hide all views first
+    ui.dashboardView.style.display = 'none';
+    ui.teamsView.style.display = 'none';
+    ui.errorBanner.style.display = 'none';
+
+    if (isAdmin) {
+      if (view === 'dashboard') {
+        ui.dashboardView.style.display = 'flex';
+        loadDashboardData();
+      }
+      if (view === 'teams') {
+        ui.teamsView.style.display = 'flex';
+        loadTeamsData();
+      }
+    }
+  }
+
   onAuthStateChanged(auth, (user) => {
     ui.errorBanner.style.display = 'none';
     if (user) {
       if (user.email === ADMIN_EMAIL) {
         // Authenticated as Admin
+        isAdmin = true;
         ui.loginView.style.display = 'none';
         ui.adminProfile.style.display = 'flex';
         ui.logoutBtn.style.display = 'flex';
         ui.adminEmail.textContent = user.email;
         ui.adminAvatar.textContent = user.email.charAt(0).toUpperCase();
         
-        loadDashboardData();
+        // Load the view user was trying to see
+        switchView(currentView);
       } else {
         // Logged in, but unauthorized
+        isAdmin = false;
         ui.loginView.style.display = 'flex';
         ui.dashboardView.style.display = 'none';
+        ui.teamsView.style.display = 'none';
         ui.adminProfile.style.display = 'none';
         ui.logoutBtn.style.display = 'flex';
+        ui.errorBanner.textContent = "You do not have permission to view this dashboard.";
         ui.errorBanner.style.display = 'block';
       }
     } else {
       // Logged out
+      isAdmin = false;
       ui.loginView.style.display = 'flex';
       ui.dashboardView.style.display = 'none';
+      ui.teamsView.style.display = 'none';
       ui.adminProfile.style.display = 'none';
       ui.logoutBtn.style.display = 'none';
     }
@@ -559,6 +652,68 @@
       ui.loader.style.display = 'none';
       ui.errorBanner.textContent = "Data Error: " + e.message;
       ui.errorBanner.style.display = 'block';
+    }
+  }
+
+  async function loadTeamsData() {
+    ui.loader.style.display = 'block';
+    ui.teamsView.style.display = 'none';
+
+    try {
+      const snap = await getDocs(collection(db, "groups"));
+      ui.teamsTableBody.innerHTML = '';
+      
+      if (snap.empty) {
+        ui.teamsTableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-tertiary);">No teams created yet.</td></tr>`;
+      } else {
+        snap.forEach(doc => {
+          const t = doc.data();
+          const tr = document.createElement('tr');
+          const dateStr = t.createdAt ? new Date(t.createdAt.seconds * 1000).toLocaleDateString() : 'N/A';
+          tr.innerHTML = `
+            <td style="font-weight:600;">${t.name}</td>
+            <td><code style="background:var(--brand-light); color:var(--brand); padding:4px 8px; border-radius:4px; font-weight:600;">${t.code}</code></td>
+            <td>${dateStr}</td>
+            <td style="font-size:12px; color:var(--text-secondary); font-family:var(--font-mono);">${t.adminUid.substring(0,8)}...</td>
+          `;
+          ui.teamsTableBody.appendChild(tr);
+        });
+      }
+      ui.loader.style.display = 'none';
+      ui.teamsView.style.display = 'flex';
+    } catch (e) {
+      console.error(e);
+      ui.loader.style.display = 'none';
+      ui.errorBanner.textContent = "Teams Data Error: " + e.message;
+      ui.errorBanner.style.display = 'block';
+    }
+  }
+
+  async function createTeam() {
+    const name = ui.newTeamNameInput.value.trim();
+    if (!name) return alert("Please enter a team name.");
+    
+    ui.createTeamBtn.disabled = true;
+    ui.createTeamBtn.textContent = "Creating...";
+
+    try {
+      const { addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js");
+      const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+      
+      await addDoc(collection(db, "groups"), {
+        name: name,
+        code: code,
+        adminUid: auth.currentUser.uid,
+        createdAt: serverTimestamp()
+      });
+
+      ui.newTeamNameInput.value = '';
+      loadTeamsData();
+    } catch (e) {
+      alert("Error: " + e.message);
+    } finally {
+      ui.createTeamBtn.disabled = false;
+      ui.createTeamBtn.textContent = "Create Team";
     }
   }
 </script>
