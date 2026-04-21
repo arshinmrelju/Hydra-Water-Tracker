@@ -75,7 +75,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+    padding: 0 env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
     overflow-x: hidden;
     position: relative;
   }
@@ -106,54 +106,71 @@
     z-index: 1;
     width: 100%;
     max-width: 420px;
-    padding: 0 20px 32px;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 24px;
     min-height: 100dvh;
+    padding-bottom: 40px;
   }
 
-  /* ─── Header ─── */
+  /* ─── Header (App Bar) ─── */
   .header {
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: 56px;
+    padding: calc(env(safe-area-inset-top, 20px) + 12px) 20px 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px; /* Extra space before content */
   }
   .logo {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
   }
   .logo-icon {
-    width: 28px; height: 28px;
+    width: 32px; height: 32px;
     background: linear-gradient(135deg, var(--water), var(--water-dark));
-    border-radius: 8px;
+    border-radius: 9px;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 2px 8px var(--water-glow);
+    box-shadow: 0 4px 12px var(--water-glow);
   }
-  .logo-icon svg { width: 16px; height: 16px; fill: white; }
+  .logo-icon svg { width: 18px; height: 18px; fill: white; }
   .logo-text {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 600;
-    letter-spacing: -0.4px;
+    letter-spacing: -0.6px;
     color: var(--text-primary);
   }
   .logo-text span { color: var(--water); }
 
   .date-badge {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
     color: var(--text-secondary);
     background: var(--surface);
     border: 1px solid var(--border);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    padding: 6px 12px;
+    padding: 7px 14px;
     border-radius: 100px;
     letter-spacing: 0.2px;
+  }
+
+  .main-content {
+    width: 100%;
+    padding: 0 20px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
   }
 
   /* ─── Progress Ring ─── */
@@ -725,86 +742,89 @@
     </div>
   </header>
 
-  <!-- Progress Ring -->
-  <div class="ring-container">
-    <div class="ring-bg"></div>
-    <div class="ring-drop"></div>
-    <svg class="ring-svg" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="waterGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style="stop-color:#38b6f8"/>
-          <stop offset="100%" style="stop-color:#1888d4"/>
-        </linearGradient>
-      </defs>
-      <circle class="ring-track" cx="130" cy="130" r="115"/>
-      <circle class="ring-progress" id="ringProgress" cx="130" cy="130" r="115"/>
-    </svg>
-    <div class="ring-inner">
-      <div class="ring-amount" id="ringAmount">0.0</div>
-      <div class="ring-unit">litres today</div>
-      <div class="ring-goal-text" id="ringGoalText">of 2.5 L goal</div>
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Progress Ring -->
+    <div class="ring-container">
+      <div class="ring-bg"></div>
+      <div class="ring-drop"></div>
+      <svg class="ring-svg" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="waterGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#38b6f8"/>
+            <stop offset="100%" style="stop-color:#1888d4"/>
+          </linearGradient>
+        </defs>
+        <circle class="ring-track" cx="130" cy="130" r="115"/>
+        <circle class="ring-progress" id="ringProgress" cx="130" cy="130" r="115"/>
+      </svg>
+      <div class="ring-inner">
+        <div class="ring-amount" id="ringAmount">0.0</div>
+        <div class="ring-unit">litres today</div>
+        <div class="ring-goal-text" id="ringGoalText">of 2.5 L goal</div>
+      </div>
     </div>
-  </div>
 
-  <!-- Motivational text -->
-  <div class="motivation" id="motivation">Start your day with a glass of water 💧</div>
+    <!-- Motivational text -->
+    <div class="motivation" id="motivation">Start your day with a glass of water 💧</div>
 
-  <!-- Stats -->
-  <div class="stats">
-    <div class="stat">
-      <span class="stat-label">Drunk</span>
-      <span class="stat-value accent" id="statDrunk">0 ml</span>
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-label">Drunk</span>
+        <span class="stat-value accent" id="statDrunk">0 ml</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-label">Remaining</span>
+        <span class="stat-value" id="statRemaining">2500 ml</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-label">Streak</span>
+        <span class="stat-value accent" id="statStreak">0 🔥</span>
+      </div>
     </div>
-    <div class="stat-divider"></div>
-    <div class="stat">
-      <span class="stat-label">Remaining</span>
-      <span class="stat-value" id="statRemaining">2500 ml</span>
-    </div>
-    <div class="stat-divider"></div>
-    <div class="stat">
-      <span class="stat-label">Streak</span>
-      <span class="stat-value accent" id="statStreak">0 🔥</span>
-    </div>
-  </div>
 
-  <!-- Main Button -->
-  <button class="add-btn" id="addBtn" onclick="addWater(250)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 5v14M5 12h14"/>
-    </svg>
-    + 250 ml
-  </button>
+    <!-- Main Button -->
+    <button class="add-btn" id="addBtn" onclick="addWater(250)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+      + 250 ml
+    </button>
 
-  <!-- Quick add -->
-  <div class="quick-add">
-    <button class="quick-btn" onclick="addWater(150)">+ 150 ml</button>
-    <button class="quick-btn" onclick="addWater(500)">+ 500 ml</button>
-    <div class="custom-water-wrap" id="customWaterWrap">
-      <input type="number" id="customWaterInput" class="custom-input" placeholder="Custom" onkeypress="if(event.key==='Enter') addCustomWater()">
-      <button class="quick-btn" style="flex-shrink:0; padding:0 12px; color:var(--water); border-color:var(--accent-ring); background:var(--accent-light);" onclick="addCustomWater()">+</button>
+    <!-- Quick add -->
+    <div class="quick-add">
+      <button class="quick-btn" onclick="addWater(150)">+ 150 ml</button>
+      <button class="quick-btn" onclick="addWater(500)">+ 500 ml</button>
+      <div class="custom-water-wrap" id="customWaterWrap">
+        <input type="number" id="customWaterInput" class="custom-input" placeholder="Custom" onkeypress="if(event.key==='Enter') addCustomWater()">
+        <button class="quick-btn" style="flex-shrink:0; padding:0 12px; color:var(--water); border-color:var(--accent-ring); background:var(--accent-light);" onclick="addCustomWater()">+</button>
+      </div>
     </div>
-  </div>
 
-  <!-- Goal editor -->
-  <div class="goal-row">
-    <span class="goal-label">Daily Goal</span>
-    <div class="goal-controls">
-      <button class="goal-adj" onclick="adjustGoal(-250)">−</button>
-      <span class="goal-value" id="goalDisplay">2.5 L</span>
-      <button class="goal-adj" onclick="adjustGoal(250)">+</button>
+    <!-- Goal editor -->
+    <div class="goal-row">
+      <span class="goal-label">Daily Goal</span>
+      <div class="goal-controls">
+        <button class="goal-adj" onclick="adjustGoal(-250)">−</button>
+        <span class="goal-value" id="goalDisplay">2.5 L</span>
+        <button class="goal-adj" onclick="adjustGoal(250)">+</button>
+      </div>
     </div>
-  </div>
 
-  <!-- Log -->
-  <div class="log-section">
-    <div class="log-header">
-      <span class="log-title">Today's log</span>
-      <button class="reset-btn" onclick="resetDay()">Reset day</button>
+    <!-- Log -->
+    <div class="log-section">
+      <div class="log-header">
+        <span class="log-title">Today's log</span>
+        <button class="reset-btn" onclick="resetDay()">Reset day</button>
+      </div>
+      <div class="log-list" id="logList">
+        <div class="log-empty" id="logEmpty">No water logged yet. Go drink some! 💧</div>
+      </div>
     </div>
-    <div class="log-list" id="logList">
-      <div class="log-empty" id="logEmpty">No water logged yet. Go drink some! 💧</div>
-    </div>
-  </div>
+  </main>
 
 </div>
 
@@ -1117,8 +1137,9 @@ onAuthStateChanged(auth, (user) => {
     currentUser = user;
     if (user.displayName) state.userName = user.displayName;
     if (user.photoURL) {
-      authBtn.innerHTML = `<img src="${user.photoURL}" style="width:26px; height:26px; border-radius:50%; object-fit:cover; display:block;" title="Logout" />`;
-      authBtn.style.padding = '2px';
+      authBtn.innerHTML = `<img src="${user.photoURL}" style="width:32px; height:32px; border-radius:50%; object-fit:cover; display:block;" title="Logout" />`;
+      authBtn.style.padding = '0px';
+      authBtn.style.border = '1.5px solid var(--border)';
     } else {
       authBtn.textContent = 'Logout';
       authBtn.style.padding = '6px 12px';
