@@ -597,7 +597,10 @@
       </div>
       <span class="logo-text">hydr<span>a</span></span>
     </div>
-    <div class="date-badge" id="dateBadge"></div>
+    <div style="display:flex; gap:10px; align-items:center;">
+      <div class="date-badge" id="dateBadge"></div>
+      <button id="authBtn" class="reset-btn" style="background:var(--surface); border:1px solid var(--border); padding:6px 12px; font-weight:500;">Login</button>
+    </div>
   </header>
 
   <!-- Progress Ring -->
@@ -686,13 +689,35 @@
 <!-- Confetti wrapper -->
 <div class="confetti-wrap" id="confettiWrap"></div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBhfX6H8QIt_E6dFkVHeXwqr7Z6rf-mCls",
+  authDomain: "watermeterpro.firebaseapp.com",
+  projectId: "watermeterpro",
+  storageBucket: "watermeterpro.firebasestorage.app",
+  messagingSenderId: "60708408734",
+  appId: "1:60708408734:web:d0ffcb5797b1e7d5a31a8f",
+  measurementId: "G-E3XJLD2142"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Auth state
+let currentUser = null;
+let unsubFirestore = null;
+
 const CIRCUMFERENCE = 2 * Math.PI * 115;
 const CONF_COLORS = ['#38b6f8','#1888d4','#34c47c','#fbbf24','#f472b6','#a78bfa'];
 
-let state = loadState();
+let state = loadLocalState();
 
-function loadState() {
+function loadLocalState() {
   const today = todayStr();
   const raw = localStorage.getItem('hydra_data');
   if (raw) {
@@ -721,6 +746,9 @@ function calcStreak(prev) {
 
 function saveState() {
   localStorage.setItem('hydra_data', JSON.stringify(state));
+  if (currentUser) {
+    setDoc(doc(db, "users", currentUser.uid), state).catch(e => console.error("Error saving to Firestore:", e));
+  }
 }
 
 function addWater(ml) {
@@ -879,6 +907,62 @@ function scheduleMidnightReset() {
     scheduleMidnightReset();
   }, msUntilMidnight);
 }
+
+// Expose core functions to window for onclick handlers
+window.addWater = addWater;
+window.adjustGoal = adjustGoal;
+window.resetDay = resetDay;
+
+// Auth UI logic
+const authBtn = document.getElementById('authBtn');
+authBtn.addEventListener('click', () => {
+  if (currentUser) {
+    signOut(auth);
+  } else {
+    signInWithPopup(auth, new GoogleAuthProvider());
+  }
+});
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    currentUser = user;
+    if (user.photoURL) {
+      authBtn.innerHTML = `<img src="${user.photoURL}" style="width:26px; height:26px; border-radius:50%; object-fit:cover; display:block;" title="Logout" />`;
+      authBtn.style.padding = '2px';
+    } else {
+      authBtn.textContent = 'Logout';
+      authBtn.style.padding = '6px 12px';
+    }
+    if (unsubFirestore) unsubFirestore();
+    unsubFirestore = onSnapshot(doc(db, "users", user.uid), (docSnap) => {
+      if (docSnap.exists()) {
+        const remoteState = docSnap.data();
+        if (remoteState.date === todayStr()) {
+          state = remoteState;
+        } else {
+          state = remoteState;
+          checkMidnight();
+        }
+        localStorage.setItem('hydra_data', JSON.stringify(state));
+      } else {
+        saveState();
+      }
+      render();
+    }, (error) => {
+      console.error("Firestore listener error:", error);
+    });
+  } else {
+    currentUser = null;
+    authBtn.textContent = 'Login';
+    authBtn.style.padding = '6px 12px';
+    if (unsubFirestore) {
+      unsubFirestore();
+      unsubFirestore = null;
+    }
+    state = loadLocalState();
+    render();
+  }
+});
 
 render();
 scheduleMidnightReset();
