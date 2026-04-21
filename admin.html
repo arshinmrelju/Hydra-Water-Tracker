@@ -522,15 +522,15 @@
           const userGoal = u.goal || 2500;
           const pct = Math.min(100, (userIntake / userGoal) * 100);
           const reached = userIntake >= userGoal;
-          const displayId = u.id.length > 8 ? u.id.substring(0,8)+'...' : u.id;
+          const userDisplayName = u.userName || (u.id.length > 8 ? u.id.substring(0,8)+'...' : u.id);
           const isActiveToday = u.date === today;
 
           const tr = document.createElement('tr');
           tr.innerHTML = `
             <td>
               <div class="user-id-col">
-                <div class="user-avatar">${displayId.charAt(0)}</div>
-                <span class="user-id-text" title="${u.id}">${displayId}</span>
+                <div class="user-avatar">${userDisplayName.charAt(0).toUpperCase()}</div>
+                <span class="user-id-text" title="${u.id}">${userDisplayName}</span>
               </div>
             </td>
             <td>${u.date || 'N/A'}</td>

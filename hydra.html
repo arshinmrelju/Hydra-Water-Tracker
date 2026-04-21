@@ -764,9 +764,9 @@ function loadLocalState() {
   if (raw) {
     const d = JSON.parse(raw);
     if (d.date === today) return d;
-    return { date: today, intake: 0, goal: d.goal || 2500, log: [], streak: calcStreak(d), customQuickAdd: d.customQuickAdd || null };
+    return { date: today, intake: 0, goal: d.goal || 2500, log: [], streak: calcStreak(d), customQuickAdd: d.customQuickAdd || null, userName: d.userName || null };
   }
-  return { date: today, intake: 0, goal: 2500, log: [], streak: 0, customQuickAdd: null };
+  return { date: today, intake: 0, goal: 2500, log: [], streak: 0, customQuickAdd: null, userName: null };
 }
 
 function todayStr(d = new Date()) {
@@ -787,6 +787,9 @@ function calcStreak(prev) {
 }
 
 function saveState() {
+  if (currentUser && currentUser.displayName) {
+    state.userName = currentUser.displayName;
+  }
   localStorage.setItem('hydra_data', JSON.stringify(state));
   if (currentUser) {
     setDoc(doc(db, "users", currentUser.uid), state).catch(e => console.error("Error saving to Firestore:", e));
@@ -1002,6 +1005,7 @@ authBtn.addEventListener('click', () => {
 onAuthStateChanged(auth, (user) => {
   if (user) {
     currentUser = user;
+    if (user.displayName) state.userName = user.displayName;
     if (user.photoURL) {
       authBtn.innerHTML = `<img src="${user.photoURL}" style="width:26px; height:26px; border-radius:50%; object-fit:cover; display:block;" title="Logout" />`;
       authBtn.style.padding = '2px';
@@ -1013,6 +1017,9 @@ onAuthStateChanged(auth, (user) => {
     unsubFirestore = onSnapshot(doc(db, "users", user.uid), (docSnap) => {
       if (docSnap.exists()) {
         const remoteState = docSnap.data();
+        // Ensure name is preserved if available from auth
+        if (user.displayName) remoteState.userName = user.displayName;
+        
         if (remoteState.date === todayStr()) {
           state = remoteState;
         } else {
@@ -1020,6 +1027,10 @@ onAuthStateChanged(auth, (user) => {
           checkMidnight();
         }
         localStorage.setItem('hydra_data', JSON.stringify(state));
+        // If the remote state didn't have the user name, update it now
+        if (user.displayName && !docSnap.data().userName) {
+           saveState();
+        }
       } else {
         saveState();
       }
