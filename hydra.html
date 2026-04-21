@@ -139,25 +139,25 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: calc(env(safe-area-inset-top, 20px) + 8px) 16px 8px;
+    padding: calc(env(safe-area-inset-top, 20px) + 14px) 20px 16px;
     position: sticky;
     top: 0;
     z-index: 100;
     background: var(--surface);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
     border-bottom: 1px solid var(--border);
-    margin-bottom: 4px;
+    margin-bottom: 12px;
   }
   .header-actions {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 10px;
   }
   .logo {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
   }
   .logo-icon {
     width: 32px; height: 32px;
@@ -183,7 +183,7 @@
     border: 1px solid var(--border);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    padding: 6px 12px;
+    padding: 7px 14px;
     border-radius: 100px;
     letter-spacing: 0.1px;
     white-space: nowrap;
@@ -194,8 +194,8 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    padding: 6px 12px;
-    border-radius: 100px;
+    padding: 7px 14px;
+    border-radius: 1000px;
     border: 1px solid var(--accent-ring);
     background: var(--accent-light);
     color: var(--accent);
@@ -204,7 +204,7 @@
     white-space: nowrap;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
   }
   .team-btn:hover { background: var(--accent-ring); }
   .team-btn svg { width: 12px; height: 12px; }
@@ -1652,16 +1652,6 @@ function scheduleMidnightReset() {
   }, msUntilMidnight);
 }
 
-// Expose core functions to window for onclick handlers
-window.addWater = addWater;
-window.addCustomWater = addCustomWater;
-window.clearCustomQuickAdd = clearCustomQuickAdd;
-window.adjustGoal = adjustGoal;
-window.resetDay = resetDay;
-window.installPwa = window.installPwa; // already defined but ensuring visibility
-window.closePwaPrompt = window.closePwaPrompt;
-window.closeIosHint = closeIosHint;
-
 // Theme Management
 function initTheme() {
   const savedTheme = localStorage.getItem('hydra_theme');
@@ -1731,14 +1721,20 @@ authBtn.addEventListener('click', () => {
   if (currentUser) {
     openSettings();
   } else {
-    signInWithPopup(auth, new GoogleAuthProvider());
+    signInWithPopup(auth, new GoogleAuthProvider())
+      .catch((error) => {
+        console.error('Login error:', error);
+        if (error.code === 'auth/popup-blocked') {
+          showToast('Popup blocked! Please allow popups for this site.');
+        } else {
+          showToast('Login failed. Please try again.');
+        }
+      });
   }
 });
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    currentUser = user;
-    if (user.displayName) state.userName = user.displayName;
     currentUser = user;
     if (user.displayName) state.userName = user.displayName;
     if (user.photoURL) {
@@ -1748,6 +1744,9 @@ onAuthStateChanged(auth, (user) => {
       authBtn.style.background = 'transparent';
     } else {
       authBtn.textContent = 'Logout';
+      authBtn.style.padding = '6px 12px';
+      authBtn.style.width = '';
+      authBtn.style.background = '';
     }
     if (unsubFirestore) unsubFirestore();
     unsubFirestore = onSnapshot(doc(db, "users", user.uid), (docSnap) => {
@@ -1778,6 +1777,8 @@ onAuthStateChanged(auth, (user) => {
     currentUser = null;
     authBtn.textContent = 'Login';
     authBtn.style.padding = '6px 12px';
+    authBtn.style.width = '';
+    authBtn.style.background = '';
     if (unsubFirestore) {
       unsubFirestore();
       unsubFirestore = null;
@@ -1833,11 +1834,23 @@ if (isIos && !isStandalone) {
   }, 4000);
 }
 
-window.closeIosHint = () => {
-  const hint = document.getElementById('iosHint');
-  if (hint) hint.style.display = 'none';
-  localStorage.setItem('ios_hint_dismissed', 'true');
-};
+// Expose core functions to window for onclick handlers
+window.addWater = addWater;
+window.addCustomWater = addCustomWater;
+window.clearCustomQuickAdd = clearCustomQuickAdd;
+window.adjustGoal = adjustGoal;
+window.resetDay = resetDay;
+window.showTeamModal = showTeamModal;
+window.closeTeamModal = closeTeamModal;
+window.submitTeamCode = submitTeamCode;
+window.leaveTeam = leaveTeam;
+window.toggleTheme = toggleTheme;
+window.openSettings = openSettings;
+window.closeSettings = closeSettings;
+window.handleLogout = handleLogout;
+window.installPwa = installPwa;
+window.closePwaPrompt = closePwaPrompt;
+window.closeIosHint = closeIosHint;
 
 render();
 scheduleMidnightReset();
