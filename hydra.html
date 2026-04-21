@@ -403,6 +403,43 @@
   }
   .quick-btn:active { transform: scale(0.94); }
 
+  /* ─── Custom input ─── */
+  .custom-water-wrap {
+    display: flex;
+    gap: 6px;
+    height: 46px;
+  }
+  .custom-input {
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: all 0.15s;
+    outline: none;
+  }
+  .custom-input::placeholder { color: var(--text-secondary); letter-spacing: -0.1px; }
+  .custom-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-ring); }
+  
+  .custom-input::-webkit-outer-spin-button,
+  .custom-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+  }
+  .custom-input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
   /* ─── Log section ─── */
   .log-section {
     width: 100%;
@@ -658,7 +695,10 @@
   <div class="quick-add">
     <button class="quick-btn" onclick="addWater(150)">+ 150 ml</button>
     <button class="quick-btn" onclick="addWater(500)">+ 500 ml</button>
-    <button class="quick-btn" onclick="addWater(750)">+ 750 ml</button>
+    <div class="custom-water-wrap" id="customWaterWrap">
+      <input type="number" id="customWaterInput" class="custom-input" placeholder="Custom" onkeypress="if(event.key==='Enter') addCustomWater()">
+      <button class="quick-btn" style="flex-shrink:0; padding:0 12px; color:var(--water); border-color:var(--accent-ring); background:var(--accent-light);" onclick="addCustomWater()">+</button>
+    </div>
   </div>
 
   <!-- Goal editor -->
@@ -724,8 +764,9 @@ function loadLocalState() {
   if (raw) {
     const d = JSON.parse(raw);
     if (d.date === today) return d;
+    return { date: today, intake: 0, goal: d.goal || 2500, log: [], streak: calcStreak(d), customQuickAdd: d.customQuickAdd || null };
   }
-  return { date: today, intake: 0, goal: 2500, log: [], streak: calcStreak(raw ? JSON.parse(raw) : null) };
+  return { date: today, intake: 0, goal: 2500, log: [], streak: 0, customQuickAdd: null };
 }
 
 function todayStr(d = new Date()) {
@@ -785,6 +826,22 @@ function addWater(ml) {
   }
 }
 
+function addCustomWater() {
+  const input = document.getElementById('customWaterInput');
+  if (!input) return;
+  const val = parseInt(input.value, 10);
+  if (!isNaN(val) && val > 0) {
+    state.customQuickAdd = val;
+    addWater(val);
+  }
+}
+
+function clearCustomQuickAdd() {
+  state.customQuickAdd = null;
+  saveState();
+  render();
+}
+
 function adjustGoal(delta) {
   const newGoal = Math.max(500, Math.min(5000, state.goal + delta));
   state.goal = newGoal;
@@ -804,7 +861,7 @@ function checkMidnight() {
   const today = todayStr();
   if (state.date !== today) {
     const prevStreak = state.intake >= state.goal ? (state.streak || 0) + 1 : 0;
-    state = { date: today, intake: 0, goal: state.goal, log: [], streak: prevStreak };
+    state = { date: today, intake: 0, goal: state.goal, log: [], streak: prevStreak, customQuickAdd: state.customQuickAdd };
   }
 }
 
@@ -864,6 +921,22 @@ function render() {
   }
   logList.innerHTML = html;
 
+  // Custom button
+  const customWrap = document.getElementById('customWaterWrap');
+  if (customWrap) {
+    if (state.customQuickAdd) {
+      customWrap.innerHTML = `
+        <button class="quick-btn" style="flex:1;" onclick="addWater(${state.customQuickAdd})">+ ${state.customQuickAdd} ml</button>
+        <button class="quick-btn" style="width:36px; flex-shrink:0; color:var(--text-tertiary); font-size:14px; padding:0;" onclick="clearCustomQuickAdd()">✕</button>
+      `;
+    } else {
+      customWrap.innerHTML = `
+        <input type="number" id="customWaterInput" class="custom-input" placeholder="Custom" onkeypress="if(event.key==='Enter') addCustomWater()">
+        <button class="quick-btn" style="flex-shrink:0; padding:0 12px; color:var(--water); border-color:var(--accent-ring); background:var(--accent-light);" onclick="addCustomWater()">+</button>
+      `;
+    }
+  }
+
   // Date badge
   const now = new Date();
   const opts = { weekday: 'short', month: 'short', day: 'numeric' };
@@ -911,6 +984,8 @@ function scheduleMidnightReset() {
 
 // Expose core functions to window for onclick handlers
 window.addWater = addWater;
+window.addCustomWater = addCustomWater;
+window.clearCustomQuickAdd = clearCustomQuickAdd;
 window.adjustGoal = adjustGoal;
 window.resetDay = resetDay;
 
