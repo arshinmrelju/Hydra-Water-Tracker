@@ -1,0 +1,11 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      // allow users to read and write their own data
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      // allow the admin email to read all user data
+      allow read: if request.auth != null && request.auth.token.email == 'arshinmrelju@gmail.com';
+    }
+  }
+}

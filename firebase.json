@@ -12,5 +12,8 @@
         "destination": "/hydra.html"
       }
     ]
+  },
+  "firestore": {
+    "rules": "firestore.rules"
   }
 }
