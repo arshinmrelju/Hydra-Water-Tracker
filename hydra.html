@@ -10,6 +10,8 @@
 <meta name="apple-mobile-web-app-title" content="Hydra" />
 <title>Hydra — Water Tracker</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<link rel="manifest" href="manifest.json" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -619,6 +621,88 @@
     80% { opacity: 1; }
     100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
   }
+
+  /* ─── PWA Install Prompts ─── */
+  .pwa-prompt {
+    position: fixed;
+    bottom: 24px;
+    left: 20px;
+    right: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 16px;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    gap: 16px;
+    animation: slideUp 0.5s cubic-bezier(0.34, 1.26, 0.64, 1);
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .pwa-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--water), var(--water-dark));
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .pwa-icon svg { width: 28px; height: 28px; fill: white; }
+  .pwa-content { flex: 1; }
+  .pwa-title { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+  .pwa-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .pwa-actions { display: flex; gap: 8px; }
+  .pwa-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+  }
+  .pwa-btn-install { background: var(--water); color: white; }
+  .pwa-btn-close { background: transparent; color: var(--text-tertiary); }
+
+  /* iOS specifics */
+  .ios-hint {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--surface-solid);
+    color: var(--text-primary);
+    padding: 16px 20px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    z-index: 1001;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: overflow-wrap;
+    max-width: 280px;
+    border: 1px solid var(--border);
+  }
+  .ios-hint::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid var(--surface-solid);
+  }
+  .ios-hint-icon { margin-bottom: 8px; }
+  .ios-hint h3 { font-size: 15px; margin-bottom: 4px; }
+  .ios-hint p { font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
+  .ios-hint span { display: inline-flex; vertical-align: middle; padding: 0 2px; }
 </style>
 </head>
 <body>
@@ -729,6 +813,29 @@
 
 <!-- Confetti wrapper -->
 <div class="confetti-wrap" id="confettiWrap"></div>
+
+<!-- Android Install Prompt -->
+<div id="pwaPrompt" class="pwa-prompt">
+  <div class="pwa-icon">
+    <svg viewBox="0 0 24 24"><path d="M12 2L12 2 5 10 5 15a7 7 0 0014 0C19 10 12 2 12 2z"/></svg>
+  </div>
+  <div class="pwa-content">
+    <div class="pwa-title">Hydra App</div>
+    <div class="pwa-sub">Install for a better experience</div>
+  </div>
+  <div class="pwa-actions">
+    <button class="pwa-btn pwa-btn-close" onclick="closePwaPrompt()">Later</button>
+    <button class="pwa-btn pwa-btn-install" onclick="installPwa()">Install</button>
+  </div>
+</div>
+
+<!-- iOS Install Hint -->
+<div id="iosHint" class="ios-hint">
+  <div class="ios-hint-icon">📱</div>
+  <h3>Install Hydra</h3>
+  <p>Tap <span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline; vertical-align:middle; color:#007aff;"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></span> then <b>'Add to Home Screen'</b> to download.</p>
+  <button class="reset-btn" style="margin-top:12px; font-weight:600;" onclick="closeIosHint()">Got it</button>
+</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
@@ -991,6 +1098,9 @@ window.addCustomWater = addCustomWater;
 window.clearCustomQuickAdd = clearCustomQuickAdd;
 window.adjustGoal = adjustGoal;
 window.resetDay = resetDay;
+window.installPwa = window.installPwa; // already defined but ensuring visibility
+window.closePwaPrompt = window.closePwaPrompt;
+window.closeIosHint = window.closeIosHint;
 
 // Auth UI logic
 const authBtn = document.getElementById('authBtn');
@@ -1051,19 +1161,65 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
+// PWA Install Logic
+let deferredPrompt;
+const pwaPrompt = document.getElementById('pwaPrompt');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Show the prompt after a short delay
+  setTimeout(() => {
+    if (!localStorage.getItem('pwa_dismissed')) {
+      pwaPrompt.style.display = 'flex';
+    }
+  }, 3000);
+});
+
+window.installPwa = () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('User accepted the A2HS prompt');
+      }
+      deferredPrompt = null;
+      pwaPrompt.style.display = 'none';
+    });
+  }
+};
+
+window.closePwaPrompt = () => {
+  pwaPrompt.style.display = 'none';
+  localStorage.setItem('pwa_dismissed', 'true');
+};
+
+// iOS Hint Logic
+const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+
+if (isIos && !isStandalone) {
+  setTimeout(() => {
+    if (!localStorage.getItem('ios_hint_dismissed')) {
+      const hint = document.getElementById('iosHint');
+      if (hint) hint.style.display = 'flex';
+    }
+  }, 4000);
+}
+
+window.closeIosHint = () => {
+  const hint = document.getElementById('iosHint');
+  if (hint) hint.style.display = 'none';
+  localStorage.setItem('ios_hint_dismissed', 'true');
+};
+
 render();
 scheduleMidnightReset();
 
 // SW registration for PWA
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    const sw = `
-self.addEventListener('install', e => self.skipWaiting());
-self.addEventListener('activate', e => clients.claim());
-self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => new Response(''))));
-    `;
-    const blob = new Blob([sw], { type: 'application/javascript' });
-    navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+    navigator.serviceWorker.register('sw.js').catch(() => {});
   });
 }
 </script>
