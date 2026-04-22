@@ -16,18 +16,18 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:          #0a0f1a;
-  --panel:       #0f1623;
-  --card:        #131d2e;
-  --card-hover:  #172236;
-  --border:      rgba(56,140,220,0.12);
-  --border-hi:   rgba(56,182,248,0.28);
-  --text-1:      #e8f2fa;
-  --text-2:      #6b8fae;
-  --text-3:      #344d63;
+  --bg:          #eef4fb;
+  --panel:       #e4edf8;
+  --card:        #fff;
+  --card-hover:  #f5f9fe;
+  --border:      rgba(56,140,220,0.18);
+  --border-hi:   rgba(33,150,243,0.35);
+  --text-1:      #0d2235;
+  --text-2:      #4a6a82;
+  --text-3:      #8aadc4;
   --water:       #38b6f8;
   --water-2:     #1c8fd8;
-  --water-glow:  rgba(56,182,248,0.22);
+  --water-glow:  rgba(56,182,248,0.30);
   --green:       #2dd4bf;
   --danger:      #f87171;
   --gold:        #fbbf24;
@@ -42,17 +42,17 @@
   --ease-spring: 0.35s cubic-bezier(0.34,1.56,0.64,1);
 }
 
-[data-theme="light"] {
-  --bg:          #eef4fb;
-  --panel:       #e4edf8;
-  --card:        #fff;
-  --card-hover:  #f5f9fe;
-  --border:      rgba(56,140,220,0.18);
-  --border-hi:   rgba(33,150,243,0.35);
-  --text-1:      #0d2235;
-  --text-2:      #4a6a82;
-  --text-3:      #8aadc4;
-  --water-glow:  rgba(56,182,248,0.30);
+[data-theme="dark"] {
+  --bg:          #0a0f1a;
+  --panel:       #0f1623;
+  --card:        #131d2e;
+  --card-hover:  #172236;
+  --border:      rgba(56,140,220,0.12);
+  --border-hi:   rgba(56,182,248,0.28);
+  --text-1:      #e8f2fa;
+  --text-2:      #6b8fae;
+  --text-3:      #344d63;
+  --water-glow:  rgba(56,182,248,0.22);
 }
 
 html, body { height: 100%; font-family: var(--font); background: var(--bg); color: var(--text-1); overflow: hidden; }
@@ -283,8 +283,8 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0;
-  padding: 28px 16px 24px;
+  gap: 20px;
+  padding: 32px 20px 42px;
   background: linear-gradient(180deg, rgba(56,182,248,0.06) 0%, transparent 70%);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -303,7 +303,6 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
   position: relative;
   width: 220px; height: 220px;
   flex-shrink: 0;
-  margin-bottom: 20px;
 }
 .ring-svg {
   position: absolute; inset: 0;
@@ -380,9 +379,10 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg); colo
 /* Motivation line */
 .motive {
   width: 100%;
-  font-size: 12.5px; color: var(--text-2);
+  font-size: 13.5px; color: var(--text-2);
   text-align: center; line-height: 1.5;
-  padding: 2px 4px;
+  padding: 4px 10px 0;
+  margin-top: 4px;
 }
 .motive .hi { color: var(--water); font-weight: 600; }
 
@@ -1635,21 +1635,17 @@ function stopLB() { if(unsubLB){unsubLB();unsubLB=null;} }
 
 // Theme
 function initTheme() {
-  const saved = localStorage.getItem('hydra_theme');
+  const saved = localStorage.getItem('hydra_theme') || 'light';
   const tg = document.getElementById('themeToggle');
-  if (saved) {
-    document.documentElement.setAttribute('data-theme', saved);
-    if(tg) tg.checked = saved==='light'; // dark theme is default, toggle shows "light"
-  }
+  document.documentElement.setAttribute('data-theme', saved);
+  if(tg) tg.checked = (saved === 'dark');
 }
 function toggleTheme() {
-  const isLight = document.getElementById('themeToggle').checked;
-  const theme = isLight ? 'light' : '';
-  if (theme) document.documentElement.setAttribute('data-theme', theme);
-  else document.documentElement.removeAttribute('data-theme');
-  if (theme) localStorage.setItem('hydra_theme', theme);
-  else localStorage.removeItem('hydra_theme');
-  showToast(isLight ? 'Light mode enabled' : 'Dark mode enabled');
+  const isDark = document.getElementById('themeToggle').checked;
+  const theme = isDark ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('hydra_theme', theme);
+  showToast(isDark ? 'Dark mode enabled' : 'Light mode enabled');
 }
 
 // Settings
@@ -1658,8 +1654,8 @@ function openSettings() {
   document.getElementById('drawerAvatar').src = currentUser.photoURL || '';
   document.getElementById('drawerName').textContent = currentUser.displayName || 'Hydra User';
   document.getElementById('drawerEmail').textContent = currentUser.email || '';
-  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-  document.getElementById('themeToggle').checked = isLight;
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.getElementById('themeToggle').checked = isDark;
   document.getElementById('settingsOverlay').classList.add('show');
 }
 function closeSettings() { document.getElementById('settingsOverlay').classList.remove('show'); }

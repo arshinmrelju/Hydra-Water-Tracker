@@ -1913,16 +1913,10 @@ function celebrate() {
 
 // Theme Management
 function initTheme() {
-  const savedTheme = localStorage.getItem('hydra_theme');
+  const savedTheme = localStorage.getItem('hydra_theme') || 'light';
   const themeToggle = document.getElementById('themeToggle');
-  if (savedTheme) {
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    if (themeToggle) themeToggle.checked = (savedTheme === 'dark');
-  } else {
-    // Default to system preference
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (themeToggle) themeToggle.checked = prefersDark;
-  }
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  if (themeToggle) themeToggle.checked = (savedTheme === 'dark');
 }
 
 function setTheme(theme) {
