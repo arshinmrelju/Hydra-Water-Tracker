@@ -8,7 +8,11 @@
     ],
     "rewrites": [
       {
-        "source": "**",
+        "source": "/app",
+        "destination": "/hydra.html"
+      },
+      {
+        "source": "/app/**",
         "destination": "/hydra.html"
       }
     ]

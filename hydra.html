@@ -237,7 +237,7 @@
 
   .main-content {
     width: 100%;
-    padding: 0 20px 32px;
+    padding: 0 20px 120px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -926,6 +926,44 @@
   .modal-btn:active {
     transform: scale(0.96);
   }
+
+  /* ─── Views & Bottom Nav ─── */
+  .view-hidden { display: none !important; }
+  .view-active { display: flex !important; }
+
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: calc(68px + env(safe-area-inset-bottom));
+    background: var(--surface-solid);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding-bottom: env(safe-area-inset-bottom);
+    z-index: 100;
+  }
+  .bn-item {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    color: var(--text-secondary);
+    font-size: 11px; font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s;
+    flex: 1;
+    height: 100%;
+  }
+  .bn-item svg { width: 24px; height: 24px; transition: transform 0.2s, stroke-width 0.2s; }
+  .bn-item.active { color: var(--water); }
+  .bn-item.active svg { transform: translateY(-2px); stroke-width: 2.5; }
+
+  /* Weekly chart styles */
+  .wc-col { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; }
+  .wc-bar-wrap { flex: 1; width: 100%; display: flex; align-items: flex-end; justify-content: center; }
+  .wc-bar { width: 100%; max-width: 24px; background: rgba(56,182,248,0.15); border-radius: 4px 4px 2px 2px; min-height: 4px; transition: height 0.6s cubic-bezier(0.34,1.2,0.64,1); }
+  .wc-bar.today { background: linear-gradient(180deg, var(--water), #1888d4); }
+  .wc-bar.met { background: linear-gradient(180deg, #34c47c, #059669); }
+  .wc-day { font-size: 10px; font-weight: 600; color: var(--text-secondary); margin-top: 6px; }
+
   /* ─── Settings Drawer ─── */
   .drawer-overlay {
     position: fixed;
@@ -1089,7 +1127,7 @@
   </header>
 
   <!-- Main Content -->
-  <main class="main-content">
+  <main class="main-content view-active" id="view-dashboard">
     <!-- Progress Ring -->
     <div class="ring-container">
       <div class="ring-bg"></div>
@@ -1196,6 +1234,67 @@
     </div>
   </main>
 
+  <main class="main-content view-hidden" id="view-history">
+    <div class="log-section">
+      <div class="log-header">
+        <span class="log-title">History</span>
+      </div>
+      <div class="log-list" id="historyViewList" style="display:flex; flex-direction:column; gap:10px;">
+        <!-- JS populated -->
+      </div>
+    </div>
+  </main>
+
+  <main class="main-content view-hidden" id="view-analytics">
+    <div class="log-section">
+      <div class="log-header">
+        <span class="log-title">Analytics Overview</span>
+      </div>
+      <div class="stats" style="flex-wrap: wrap; gap: 16px; border-radius: 20px;">
+        <div class="stat" style="flex: 1 1 40%; align-items: center; padding: 12px 0;">
+          <span class="stat-label">7-Day Avg</span>
+          <span class="stat-value accent" id="an-avg">0 ml</span>
+        </div>
+        <div class="stat" style="flex: 1 1 40%; align-items: center; padding: 12px 0;">
+          <span class="stat-label">Completion</span>
+          <span class="stat-value" id="an-rate">0%</span>
+        </div>
+        <div class="stat" style="flex: 1 1 40%; align-items: center; padding: 12px 0;">
+          <span class="stat-label">Best Day</span>
+          <span class="stat-value accent" id="an-best">0 ml</span>
+        </div>
+        <div class="stat" style="flex: 1 1 40%; align-items: center; padding: 12px 0;">
+          <span class="stat-label">Current Streak</span>
+          <span class="stat-value" id="an-streak">0 🔥</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="log-section" style="margin-top: 24px;">
+      <div class="log-header">
+        <span class="log-title">Weekly Trend</span>
+      </div>
+      <div class="wc-bars" id="analyticsChart" style="display: flex; align-items: flex-end; gap: 6px; height: 180px; margin-top: 12px; padding: 20px 16px; background: var(--bg); border-radius: 20px; border: 1px solid var(--border);">
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <div class="bn-item active" id="nav-dashboard" onclick="switchTab('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Dashboard</span>
+    </div>
+    <div class="bn-item" id="nav-history" onclick="switchTab('history')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>History</span>
+    </div>
+    <div class="bn-item" id="nav-analytics" onclick="switchTab('analytics')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span>Analytics</span>
+    </div>
+  </nav>
+
 </div>
 
 <!-- Toast -->
@@ -1286,6 +1385,12 @@ function loadLocalState() {
   if (raw) {
     const d = JSON.parse(raw);
     if (d.date === today) return d;
+    
+    const prev = d;
+    const wh = prev.weekHistory || [];
+    wh.push({ date: prev.date, intake: prev.intake, goal: prev.goal });
+    if (wh.length > 7) wh.shift();
+
     return { 
       date: today, 
       intake: 0, 
@@ -1295,10 +1400,11 @@ function loadLocalState() {
       customQuickAdd: d.customQuickAdd || null, 
       userName: d.userName || null,
       groupId: d.groupId || null,
-      groupName: d.groupName || null
+      groupName: d.groupName || null,
+      weekHistory: wh
     };
   }
-  return { date: today, intake: 0, goal: 2500, log: [], streak: 0, customQuickAdd: null, userName: null, groupId: null, groupName: null };
+  return { date: today, intake: 0, goal: 2500, log: [], streak: 0, customQuickAdd: null, userName: null, groupId: null, groupName: null, weekHistory: [] };
 }
 
 function todayStr(d = new Date()) {
@@ -1395,8 +1501,22 @@ function resetDay() {
 function checkMidnight() {
   const today = todayStr();
   if (state.date !== today) {
+    const wh = state.weekHistory || [];
+    wh.push({ date: state.date, intake: state.intake, goal: state.goal });
+    if (wh.length > 7) wh.shift();
     const prevStreak = state.intake >= state.goal ? (state.streak || 0) + 1 : 0;
-    state = { date: today, intake: 0, goal: state.goal, log: [], streak: prevStreak, customQuickAdd: state.customQuickAdd };
+    state = {
+      date: today,
+      intake: 0,
+      goal: state.goal,
+      log: [],
+      streak: prevStreak,
+      customQuickAdd: state.customQuickAdd,
+      userName: state.userName || null,
+      groupId: state.groupId || null,
+      groupName: state.groupName || null,
+      weekHistory: wh
+    };
   }
 }
 
@@ -1498,6 +1618,11 @@ function render() {
     teamSection.style.display = 'none';
     stopLeaderboardSync();
   }
+
+  // Views
+  const activeTab = document.querySelector('.bn-item.active')?.id;
+  if (activeTab === 'nav-history') renderHistory();
+  if (activeTab === 'nav-analytics') renderAnalytics();
 }
 
 async function showTeamModal() {
@@ -1851,6 +1976,110 @@ if (isIos && !isStandalone) {
   }, 4000);
 }
 
+// Tabs and Views
+function switchTab(tabId) {
+  ['dashboard', 'history', 'analytics'].forEach(id => {
+    const el = document.getElementById('nav-' + id);
+    if (el) {
+      if (id === tabId) el.classList.add('active');
+      else el.classList.remove('active');
+    }
+  });
+
+  ['dashboard', 'history', 'analytics'].forEach(id => {
+    const view = document.getElementById('view-' + id);
+    if (view) {
+      if (id === tabId) {
+        view.classList.remove('view-hidden');
+        view.classList.add('view-active');
+      } else {
+        view.classList.add('view-hidden');
+        view.classList.remove('view-active');
+      }
+    }
+  });
+
+  if (tabId === 'history') renderHistory();
+  if (tabId === 'analytics') renderAnalytics();
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyViewList');
+  if (!list) return;
+
+  const wh = state.weekHistory || [];
+  if (wh.length === 0) {
+    list.innerHTML = '<div class="log-empty">No history available yet.</div>';
+    return;
+  }
+
+  const sorted = [...wh].sort((a, b) => b.date.localeCompare(a.date));
+
+  list.innerHTML = sorted.map(d => {
+    const pct = Math.min(100, Math.round(((d.intake || 0) / (d.goal || 2500)) * 100));
+    const met = d.intake >= d.goal;
+    const dateObj = new Date(d.date + "T00:00:00");
+    const dateStr = isNaN(dateObj) ? d.date : dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    
+    return `<div style="background:var(--surface);border:1px solid ${met ? 'var(--green)' : 'var(--border)'};border-radius:16px;padding:16px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:15px;font-weight:600;color:var(--text-primary);">${dateStr}</div>
+        <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">Goal: ${(d.goal||2500)} ml</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;">
+        <div style="font-size:16px;font-weight:700;color:${met ? 'var(--green)' : 'var(--water)'};">${d.intake} ml</div>
+        <div style="width:60px;height:5px;background:var(--border);border-radius:3px;margin-top:6px;overflow:hidden;">
+          <div style="height:100%;background:${met ? 'var(--green)' : 'var(--water)'};width:${pct}%;"></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderAnalytics() {
+  const wh = state.weekHistory || [];
+  const allDays = [...wh, { date: state.date, intake: state.intake, goal: state.goal }];
+  
+  if (allDays.length === 0) return;
+
+  const totalIntake = allDays.reduce((sum, d) => sum + (d.intake || 0), 0);
+  const avgIntake = Math.round(totalIntake / allDays.length);
+  const bestDay = Math.max(...allDays.map(d => d.intake || 0));
+  const metDays = allDays.filter(d => (d.intake || 0) >= (d.goal || 2500)).length;
+  const completionRate = Math.round((metDays / allDays.length) * 100);
+
+  document.getElementById('an-avg').textContent = `${avgIntake} ml`;
+  document.getElementById('an-rate').textContent = `${completionRate}%`;
+  document.getElementById('an-best').textContent = `${bestDay} ml`;
+  document.getElementById('an-streak').textContent = `${state.streak || 0} 🔥`;
+
+  const el = document.getElementById('analyticsChart');
+  if (el) {
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const now = new Date();
+    let slots = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now); d.setDate(d.getDate()-i);
+      const dstr = todayStr(d); const isToday = i===0;
+      let intake = 0, goal = state.goal;
+      if (isToday) intake = state.intake;
+      else { const h = (state.weekHistory||[]).find(x => x.date===dstr); if(h){intake=h.intake;goal=h.goal||state.goal;} }
+      slots.push({ day: days[d.getDay()], intake, goal, isToday });
+    }
+    const maxGoal = Math.max(...slots.map(s => s.goal), ...slots.map(s => s.intake));
+    el.innerHTML = slots.map(s => {
+      const hp = maxGoal ? Math.round((s.intake/maxGoal)*100) : 0;
+      const cls = s.isToday ? 'today' : s.intake>=s.goal&&!s.isToday ? 'met' : '';
+      return `<div class="wc-col${s.isToday?' is-today':''}">
+        <div class="wc-bar-wrap">
+          <div class="wc-bar ${cls}" style="height:${Math.max(3,hp)}%;" title="${s.intake}ml"></div>
+        </div>
+        <div class="wc-day">${s.day}</div>
+      </div>`;
+    }).join('');
+  }
+}
+
 // Expose core functions to window for onclick handlers
 window.addWater = addWater;
 window.addCustomWater = addCustomWater;
@@ -1868,6 +2097,13 @@ window.handleLogout = handleLogout;
 window.installPwa = installPwa;
 window.closePwaPrompt = closePwaPrompt;
 window.closeIosHint = closeIosHint;
+window.switchTab = switchTab;
+
+function scheduleMidnightReset() {
+  const now = new Date();
+  const ms = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1) - now;
+  setTimeout(() => { checkMidnight(); render(); scheduleMidnightReset(); }, ms);
+}
 
 render();
 scheduleMidnightReset();
