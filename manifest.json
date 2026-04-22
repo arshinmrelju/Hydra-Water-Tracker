@@ -1,7 +1,7 @@
 {
   "name": "Hydra — Water Tracker",
   "short_name": "Hydra",
-  "description": "Premium water tracking and hydration analytics app.",
+  "description": "Smart water tracking and hydration analytics. An initiative from Kerala.",
   "start_url": "/hydra.html",
   "display": "standalone",
   "background_color": "#0d1117",
