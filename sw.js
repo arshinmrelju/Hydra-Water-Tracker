@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hydra-v2';
+const CACHE_NAME = 'hydra-v3';
 const ASSETS = [
   '/hydra.html',
   '/manifest.json',
@@ -29,13 +29,39 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Only cache GET requests
-  if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
   
+  // Only handle GET requests
+  if (event.request.method !== 'GET') return;
+
+  // Network-First for the main HTML file to ensure updates are picked up
+  if (url.pathname === '/hydra.html' || url.pathname === '/' || url.pathname === '/index.html') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const clonedResponse = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, clonedResponse);
+          });
+          return response;
+        })
+        .catch(() => {
+          return caches.match(event.request);
+        })
+    );
+    return;
+  }
+
+  // Cache-First for other assets
   event.respondWith(
     caches.match(event.request).then((cached) => {
-      return cached || fetch(event.request).catch(() => {
-        // Fallback for when both cache and network fail
+      return cached || fetch(event.request).then((response) => {
+        const clonedResponse = response.clone();
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, clonedResponse);
+        });
+        return response;
+      }).catch(() => {
         return new Response('');
       });
     })

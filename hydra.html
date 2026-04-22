@@ -61,6 +61,7 @@
     --water-glow: rgba(56,182,248,0.3);
     --danger: #f06060;
     --success: #34c47c;
+    --green: #34c47c;
     --radius: 28px;
     --radius-sm: 16px;
     --shadow: 0 8px 32px rgba(30,90,150,0.10), 0 1.5px 4px rgba(30,90,150,0.06);
@@ -85,6 +86,7 @@
       --water: #38b6f8;
       --water-dark: #1888d4;
       --water-glow: rgba(56,182,248,0.22);
+      --green: #34c47c;
       --shadow: 0 8px 32px rgba(0,0,0,0.36), 0 1.5px 4px rgba(0,0,0,0.18);
       --shadow-btn: 0 4px 20px rgba(56,182,248,0.22);
     }
@@ -1493,26 +1495,30 @@ function loadLocalState() {
   const today = todayStr();
   const raw = localStorage.getItem('hydra_data');
   if (raw) {
-    const d = JSON.parse(raw);
-    if (d.date === today) return d;
-    
-    const prev = d;
-    const wh = prev.weekHistory || [];
-    wh.push({ date: prev.date, intake: prev.intake, goal: prev.goal });
-    if (wh.length > 7) wh.shift();
+    try {
+      const d = JSON.parse(raw);
+      if (d.date === today) return d;
+      
+      const prev = d;
+      const wh = prev.weekHistory || [];
+      wh.push({ date: prev.date, intake: prev.intake, goal: prev.goal });
+      if (wh.length > 7) wh.shift();
 
-    return { 
-      date: today, 
-      intake: 0, 
-      goal: d.goal || 2500, 
-      log: [], 
-      streak: calcStreak(d), 
-      customQuickAdd: d.customQuickAdd || null, 
-      userName: d.userName || null,
-      groupId: d.groupId || null,
-      groupName: d.groupName || null,
-      weekHistory: wh
-    };
+      return { 
+        date: today, 
+        intake: 0, 
+        goal: d.goal || 2500, 
+        log: [], 
+        streak: calcStreak(d), 
+        customQuickAdd: d.customQuickAdd || null, 
+        userName: d.userName || null,
+        groupId: d.groupId || null,
+        groupName: d.groupName || null,
+        weekHistory: wh
+      };
+    } catch (e) {
+      console.error("Error parsing local state:", e);
+    }
   }
   return { date: today, intake: 0, goal: 2500, log: [], streak: 0, customQuickAdd: null, userName: null, groupId: null, groupName: null, weekHistory: [] };
 }
@@ -2131,7 +2137,7 @@ function renderHistory() {
     const pct = Math.min(100, Math.round(((d.intake || 0) / (d.goal || 2500)) * 100));
     const met = d.intake >= d.goal;
     const dateObj = new Date(d.date + "T00:00:00");
-    const dateStr = isNaN(dateObj) ? d.date : dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    const dateStr = (isNaN(dateObj.getTime())) ? d.date : dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
     
     return `<div style="background:var(--surface);border:1px solid ${met ? 'var(--green)' : 'var(--border)'};border-radius:16px;padding:16px;display:flex;align-items:center;justify-content:space-between;">
       <div>
