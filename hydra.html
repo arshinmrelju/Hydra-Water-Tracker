@@ -1100,9 +1100,119 @@
     transition: all 0.2s;
   }
   .logout-btn:active { transform: scale(0.98); background: rgba(240, 96, 96, 0.12); }
+  /* ─── Splash Screen ─── */
+  .splash-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s;
+    overflow: hidden;
+  }
+  .splash-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .splash-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    z-index: 2;
+    animation: splashFloat 2s ease-in-out infinite alternate;
+  }
+  .splash-logo {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-solid);
+    border-radius: 24px;
+    box-shadow: 0 12px 40px var(--water-glow);
+    animation: splashPulse 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+  .splash-logo svg {
+    width: 48px;
+    height: 48px;
+  }
+  .splash-text {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--text-primary);
+    background: linear-gradient(135deg, var(--water), var(--water-dark));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .splash-wave {
+    position: absolute;
+    bottom: -50px;
+    left: -50%;
+    width: 200%;
+    height: 200px;
+    background: var(--water-glow);
+    border-radius: 40%;
+    animation: waveAnim 5s linear infinite;
+    z-index: 1;
+    filter: blur(20px);
+  }
+  .splash-wave-2 {
+    bottom: -70px;
+    background: var(--accent-light);
+    animation: waveAnim 7s linear infinite reverse;
+  }
+  @keyframes splashFloat {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-10px); }
+  }
+  @keyframes splashPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 12px 40px var(--water-glow); }
+    50% { transform: scale(1.05); box-shadow: 0 20px 50px var(--water-glow); }
+  }
+  @keyframes waveAnim {
+    0% { transform: translateX(0) rotate(0deg); }
+    100% { transform: translateX(-25%) rotate(360deg); }
+  }
 </style>
 </head>
 <body>
+
+<!-- Splash Screen -->
+<div id="splash-screen" class="splash-screen">
+  <div class="splash-content">
+    <div class="splash-logo">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 21.5C17.2467 21.5 21.5 17.2467 21.5 12C21.5 8.5 18.5 5.5 12 2C5.5 5.5 2.5 8.5 2.5 12C2.5 17.2467 6.75329 21.5 12 21.5Z" fill="url(#splashGrad)"/>
+        <defs>
+          <linearGradient id="splashGrad" x1="12" y1="2" x2="12" y2="21.5" gradientUnits="userSpaceOnUse">
+            <stop stop-color="var(--water)"/>
+            <stop offset="1" stop-color="var(--water-dark)"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <div class="splash-text">hydr<span>a</span></div>
+  </div>
+  <div class="splash-wave"></div>
+  <div class="splash-wave splash-wave-2"></div>
+</div>
+
+<script>
+  setTimeout(function() {
+    var splash = document.getElementById('splash-screen');
+    if (splash) {
+      splash.classList.add('hidden');
+      setTimeout(function() { splash.remove(); }, 600);
+    }
+  }, 1800);
+</script>
 
 <div class="app">
 
@@ -2110,11 +2220,14 @@ scheduleMidnightReset();
 initTheme();
 
 // SW registration for PWA
+// SW registration for PWA
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   });
 }
+
+
 </script>
 </body>
 </html>
