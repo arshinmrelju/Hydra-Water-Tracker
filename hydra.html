@@ -1860,10 +1860,21 @@ function renderLeaderboard(snap) {
   list.innerHTML = html;
 }
 
+
+// Expose core functions to window for onclick handlers
+window.addWater = addWater;
+window.addCustomWater = addCustomWater;
+window.clearCustomQuickAdd = clearCustomQuickAdd;
+window.adjustGoal = adjustGoal;
+window.resetDay = resetDay;
 window.showTeamModal = showTeamModal;
 window.closeTeamModal = closeTeamModal;
 window.submitTeamCode = submitTeamCode;
 window.leaveTeam = leaveTeam;
+window.toggleTheme = toggleTheme;
+window.openSettings = openSettings;
+window.closeSettings = closeSettings;
+window.handleLogout = handleLogout;
 
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -1893,16 +1904,6 @@ function celebrate() {
   setTimeout(() => { wrap.innerHTML = ''; }, 2500);
 }
 
-// Auto-reset at midnight
-function scheduleMidnightReset() {
-  const now = new Date();
-  const msUntilMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1) - now;
-  setTimeout(() => {
-    checkMidnight();
-    render();
-    scheduleMidnightReset();
-  }, msUntilMidnight);
-}
 
 // Theme Management
 function initTheme() {
@@ -1960,11 +1961,6 @@ function handleLogout() {
     showToast('Error logging out');
   });
 }
-
-window.toggleTheme = toggleTheme;
-window.openSettings = openSettings;
-window.closeSettings = closeSettings;
-window.handleLogout = handleLogout;
 
 
 // Auth UI logic
@@ -2086,6 +2082,12 @@ if (isIos && !isStandalone) {
   }, 4000);
 }
 
+function closeIosHint() {
+  const hint = document.getElementById('iosHint');
+  if (hint) hint.style.display = 'none';
+  localStorage.setItem('ios_hint_dismissed', 'true');
+}
+
 // Tabs and Views
 function switchTab(tabId) {
   ['dashboard', 'history', 'analytics'].forEach(id => {
@@ -2190,24 +2192,10 @@ function renderAnalytics() {
   }
 }
 
-// Expose core functions to window for onclick handlers
-window.addWater = addWater;
-window.addCustomWater = addCustomWater;
-window.clearCustomQuickAdd = clearCustomQuickAdd;
-window.adjustGoal = adjustGoal;
-window.resetDay = resetDay;
-window.showTeamModal = showTeamModal;
-window.closeTeamModal = closeTeamModal;
-window.submitTeamCode = submitTeamCode;
-window.leaveTeam = leaveTeam;
-window.toggleTheme = toggleTheme;
-window.openSettings = openSettings;
-window.closeSettings = closeSettings;
-window.handleLogout = handleLogout;
-window.installPwa = installPwa;
-window.closePwaPrompt = closePwaPrompt;
 window.closeIosHint = closeIosHint;
 window.switchTab = switchTab;
+window.installPwa = installPwa;
+window.closePwaPrompt = closePwaPrompt;
 
 function scheduleMidnightReset() {
   const now = new Date();
