@@ -1,15 +1,38 @@
-# Hydra - Water Tracker 💧
+# <p align="center"><img src="logo.png" width="120" alt="Hydra Logo"><br>Hydra - Water Tracker</p>
 
-Hydra is a beautifully designed, mobile-first web application for tracking your daily hydration. It features a clean, responsive UI with real-time feedback, daily goals, and streaks. 
+<p align="center">
+  <em>A premium, privacy-focused hydration tracking suite for everyone.</em>
+</p>
 
-## Features
-- **Visual Progress:** Dynamic circular progress ring representing your daily water intake.
-- **Quick Logging:** One-tap buttons to add common amounts of water (150ml, 250ml, 500ml, 750ml).
-- **Daily Goals:** Easy-to-adjust daily hydration goals.
-- **Local Storage:** All your data is saved automatically and kept private on your device using `localStorage`.
-- **Streaks & Logs:** Built-in history to let you verify your intake log for the day and maintain daily health streaks.
-- **Theme Support:** Adaptive styling seamlessly supports both Light and Dark mode depending on user preferences.
-- **Micro-animations:** Water drop ripples, celebration confetti, and neat slide-in graphics give it a premium feel.
+---
 
-## Getting Started
-It's just a single HTML file! Simply open `hydra.html` in your web browser, or host it effortlessly on GitHub Pages or Vercel.
+Hydra is a beautifully designed, cross-platform hydration tracking application. Built with a focus on aesthetics and performance, Hydra helps you stay on top of your daily water intake with real-time feedback, detailed analytics, and seamless multi-device synchronization.
+
+## ✨ Key Features
+
+- **🌊 Fluid Visual Progress:** A dynamic, animated hydration ring that reflects your current intake status.
+- **📱 Mobile & Desktop Ready:** Optimized experiences for both handheld and large-screen devices.
+- **📊 Detailed Analytics:** Track your hydration trends over time with built-in history and daily summaries.
+- **🔥 Streaks & Goals:** Stay motivated with daily streaks and easily adjustable hydration targets.
+- **☁️ Real-time Sync:** Powered by Firebase for instant data synchronization across all your devices.
+- **🌓 Dark Mode:** Seamless support for system-level light and dark themes.
+- **✨ Premium UI:** Built with Vanilla CSS, featuring glassmorphism, micro-animations, and smooth transitions.
+
+## 🚀 Getting Started
+
+Hydra is designed to be lightweight and easy to deploy.
+
+1. **Local Access:** Simply open `index.html` (Landing Page) or `hydra.html` (App) in any modern web browser.
+2. **Configuration:** Update `firebase-config.js` with your own Firebase credentials to enable cloud sync.
+3. **Deployment:** Optimized for Firebase Hosting, GitHub Pages, or any static hosting service.
+
+## 🛠️ Technology Stack
+
+- **Frontend:** Semantic HTML5, Vanilla CSS3, Modern JavaScript (ES6+).
+- **Backend:** Firebase Firestore (Real-time Database).
+- **Deployment:** Firebase Hosting.
+- **Design:** Modern typography (Inter), Glassmorphism, CSS Animations.
+
+---
+
+<p align="center">Made with ❤️ for a healthier world.</p>
