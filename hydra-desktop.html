@@ -1545,8 +1545,21 @@ function midnight() {
     const wh = state.weekHistory || [];
     wh.push({ date: state.date, intake: state.intake, goal: state.goal });
     if (wh.length > 7) wh.shift();
-    const streak = state.intake >= state.goal ? (state.streak||0)+1 : 0;
-    state = { date: today, intake: 0, goal: state.goal, log: [], streak, customQuickAdd: state.customQuickAdd, userName: state.userName, groupId: state.groupId, groupName: state.groupName, weekHistory: wh };
+    
+    const newStreak = calcStreak(state);
+    
+    state = { 
+      date: today, 
+      intake: 0, 
+      goal: state.goal, 
+      log: [], 
+      streak: newStreak, 
+      customQuickAdd: state.customQuickAdd, 
+      userName: state.userName, 
+      groupId: state.groupId, 
+      groupName: state.groupName, 
+      weekHistory: wh 
+    };
   }
 }
 

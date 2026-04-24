@@ -1713,13 +1713,15 @@ function checkMidnight() {
     const wh = state.weekHistory || [];
     wh.push({ date: state.date, intake: state.intake, goal: state.goal });
     if (wh.length > 7) wh.shift();
-    const prevStreak = state.intake >= state.goal ? (state.streak || 0) + 1 : 0;
+    
+    const newStreak = calcStreak(state);
+    
     state = {
       date: today,
       intake: 0,
       goal: state.goal,
       log: [],
-      streak: prevStreak,
+      streak: newStreak,
       customQuickAdd: state.customQuickAdd,
       userName: state.userName || null,
       groupId: state.groupId || null,
